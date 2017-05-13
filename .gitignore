@@ -1,0 +1,18 @@
+# Ignore the build and lib dirs
+build
+lib/*
+
+# Ignore cmake
+cmake-build-debug/
+
+# Ignore resources
+resources/
+
+# Ignore any executables
+bin/*
+
+# Ignore Mac specific files
+.DS_Store
+
+# Ignore misc
+.idea
