@@ -1,5 +1,9 @@
-#include <iostream>
 #include "streaker.hh"
+
+#include <thread>
+#include <iostream>
+#include <vector>
+#include <algorithm>
 
 #include <boost/regex.hpp>
 #include <boost/xpressive/xpressive.hpp>
@@ -10,24 +14,26 @@
 namespace xp = boost::xpressive;
 namespace fs = boost::filesystem;
 
-typedef std::vector< boost::filesystem::directory_entry > Paths;
+bool parse( const std::string& string,
+            const std::string& pattern,
+            std::string& id,
+            std::string& padding,
+            std::string& extension ) {
 
-bool parse( const std::string& pattern, std::string& id, std::string& extension ) {
-
-    xp::sregex rx = xp::sregex::compile( SEQUENCE );
+    xp::sregex rx = xp::sregex::compile( pattern );
     xp::smatch match;
 
-    fs::path path( pattern );
+    fs::path path( string );
 
     bool result = false;
-    if( xp::regex_search( path.filename().string(), match, rx ) ) {
+    if ( xp::regex_search( path.filename().string(), match, rx ) ) {
         id = match["name"];
+        padding = match["padding"];
         extension = match["extension"];
         result = true;
     }
     return result;
 }
-
 
 
 Streak findStreak( const std::string& pattern_path ) {
@@ -40,18 +46,17 @@ Streak findStreak( const std::string& pattern_path ) {
     }
 
     // Check pattern
-    std::string id;
-    std::string ext;
-    if ( !parse( path.filename().string(), id, ext ) ) {
+    std::string name, padding, extension;
+    if ( !parse( path.filename().string(), SEQUENCE, name, padding, extension ) ) {
         std::cerr << "Invalid pattern: " << path << std::endl;
         return Streak();
     }
 
-    std::cerr << "Extracted: id=" << id << ", ext=" << ext << std::endl;
+//    std::cerr << "Extracted: name=" << name << ", padding=" << padding << ", ext=" << extension << std::endl;
 
     Streaker streaker;
     streaker.setDirectory( path.parent_path().string() );
-    Streak streak = streaker.find( id, ext );
+    Streak streak = streaker.find( name, padding, extension );
     return streak;
 }
 
@@ -65,6 +70,7 @@ void Streaker::setDirectory( const std::string& directory ) {
 }
 
 Streak Streaker::find( const std::string& name,
+                       const std::string& padding,
                        const std::string& extension ) {
 
     // Is name and extension valid?
@@ -87,61 +93,152 @@ Streak Streaker::find( const std::string& name,
     }
 
     // Collect all paths that match
-    Paths matches;
-    fs::directory_iterator iter( m_directory );
-    fs::directory_iterator iterEnd;
-    while ( iter != iterEnd ) {
+    fs::directory_iterator dirIterBegin( m_directory );
+    fs::directory_iterator dirIterEnd;
 
-        // Found a file
-        if ( fs::is_regular_file( *iter ) ) {
-            if ( ( iter->path().extension().string() == extension ) &&
-                 boost::starts_with( iter->path().filename().string(), name ) ) {
-
-                // Found match
-                matches.push_back( *iter );
-
-                // Get name, number, extension
-
-
-
-            }
-        }
-        ++iter;
+    Paths paths;
+    while ( dirIterBegin != dirIterEnd ) {
+        paths.push_back( dirIterBegin->path() );
+        ++dirIterBegin;
     }
 
-    if ( matches.empty() ) {
-        std::cerr << "No matches found for pattern: name="
-        << name << ", extension="
-        << extension << std::endl;
-        return Streak();
+
+    Streak source;
+    Streak target( m_directory.string(),
+                  name,
+                  Padding( padding ),
+                  FrameRange(),
+                  extension );
+
+    std::thread worker = std::thread( &Streaker::run,
+                                      this,
+                                      paths.begin(),
+                                      paths.end(),
+                                      std::ref( target ),
+                                      std::ref( source ) );
+
+    if ( worker.joinable() ) {
+        worker.join();
     }
 
-    std::cerr << "Found matches: " << matches.size() << std::endl;
+//    std::cerr << "Streaks: " << streaks.size() << std::endl;
+
+//
+//    // Make sure the iterators are sequential
+//    const long length = paths.size();
+//
+//    // Amount of hardware threads available
+//    const unsigned long numThreads = std::thread::hardware_concurrency();
+//
+//    // How many numbers to process in each thread
+//    const unsigned long chunk = length / numThreads;
+//
+//    std::cerr << "Length: " << length << std::endl;
+//    std::cerr << "Chunk: " << chunk << std::endl;
+
+//    std::vector< std::thread > threads( numThreads );
+
+
+//    Paths::iterator chunkStartIter = paths.begin();
+//    for ( std::size_t threadIndex = 0;
+//          threadIndex < numThreads;
+//          ++threadIndex ) {
+//
+//        std::cerr << threadIndex << std::endl;
+//
+//        Paths::iterator chunkEndIter = chunkStartIter;
+//        std::advance( chunkEndIter, chunk );
+//
+//        // Store thread
+//        threads[threadIndex] = std::thread( &Streaker::run,
+//                                            this,
+//                                            chunkStartIter,
+//                                            chunkEndIter,
+//                                            streak );
+//
+//        // Next thread chunk
+//        chunkStartIter = chunkEndIter;
+//    }
+//
+//    printf( "Joining threads: %lu\n", threads.size() );
+//    for ( std::vector< std::thread >::iterator threadIter;
+//          threadIter != threads.end();
+//          ++threadIter ) {
+//        if ( threadIter->joinable() ) {
+//            threadIter->join();
+//        }
+//    }
+
+
+//    if ( matches.empty() ) {
+//        std::cerr << "No matches found for pattern: name="
+//                  << name
+//                  << ", padding="
+//                  << Padding( padding ).getFill()
+//                  << ", extension="
+//                  << extension << std::endl;
+//        return Streak();
+//    }
+
+//    std::cerr << "Found matches: " << matches.size() << std::endl;
 
     return Streak();
 }
 
-//Streaker::Streaker( const std::string& pattern ) {
-//
-//    std::string id, ext;
-//    if ( !parse( pattern, id, ext ) ) {
-//        std::cerr << "Invalid pattern: " << pattern << std::endl;
-//        return;
-//    }
-//
-//    fs::path path( pattern );
-//
-//    Paths paths;
-//    if ( boost::filesystem::is_directory( path.parent_path() ) ) {
-//        std::copy( boost::filesystem::directory_iterator( path.parent_path() ),
-//                   boost::filesystem::directory_iterator(),
-//                   std::back_inserter( paths ) );
-//    }
-//
-//    printf( "About to scan %lu file(s)\n", paths.size() );
-//
-//    for ( Paths::iterator pathIter = paths.begin();
-//          pathIter != paths.end();
-//          ++pathIter ) {
-//    }
-//}
+void Streaker::run( Paths::iterator iterBegin,
+                    Paths::iterator iterLast,
+                    Streak& source,
+                    Streak& target ) {
+
+    // Make sure the iterators are sequential
+    const long length = std::distance( iterBegin, iterLast );
+    if ( length <= 0 ) {
+        return;
+    }
+
+    Frames frames;
+
+    const std::string& name = target.getName();
+    const Padding& padding = target.getPadding();
+    const std::string& extension = target.getExtension();
+
+    while ( iterBegin != iterLast ) {
+
+        // Found a file
+        if ( fs::is_regular_file( *iterBegin ) ) {
+
+            // Read filename
+            std::string checkName, checkPadding, checkExtension;
+            if ( !parse( iterBegin->filename().string(),
+                         SIMPLE,
+                         checkName,
+                         checkPadding,
+                         checkExtension ) ) {
+                ++iterBegin;
+                continue;
+            }
+
+            // Check target
+            if ( checkExtension != extension ||
+                 checkName != name ||
+                 Padding( checkPadding ) != Padding( padding ) ) {
+                ++iterBegin;
+                continue;
+            }
+
+
+            int frame = std::stoi( checkPadding.c_str() );
+            frames.push_back( frame );
+
+            // Increment
+            ++iterBegin;
+        }
+    }
+
+    // Update streak
+    FrameRange range;
+    for ( auto& frame: frames ) {
+        range.addFrame( frame );
+    }
+    source.setRange( range );
+}

@@ -12,8 +12,14 @@ namespace xp = boost::xpressive;
 
 Streak::Streak( const std::string& directory,
                 const std::string& name,
+                const Padding& padding,
                 const FrameRange& range,
-                const std::string& extension ) {
+                const std::string& extension )
+        : m_directory( directory ),
+          m_name( name ),
+          m_padding( padding ),
+          m_range( range ),
+          m_extension( extension ) {
 }
 
 std::string Streak::getDirectory() const {
@@ -22,6 +28,10 @@ std::string Streak::getDirectory() const {
 
 std::string Streak::getName() const {
     return m_name;
+}
+
+Padding Streak::getPadding() const {
+    return m_padding;
 }
 
 FrameRange Streak::getRange() const {
@@ -38,6 +48,10 @@ void Streak::setDirectory( const std::string& directory ) {
 
 void Streak::setName( const std::string& name ) {
     m_name = name;
+}
+
+void Streak::setPadding( const Padding& padding ) {
+    m_padding = padding;
 }
 
 void Streak::setRange( const FrameRange& range ) {

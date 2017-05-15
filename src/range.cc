@@ -38,6 +38,7 @@ void FrameRange::update() {
         return;
     }
 
+    // Update
     std::sort( m_frames.begin(), m_frames.end() );
     m_first = m_frames.front();
     m_last = m_frames.back();

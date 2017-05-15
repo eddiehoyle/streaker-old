@@ -27,7 +27,6 @@ public:
     ~FrameRange();
 
     void addFrame( int frame );
-
     void setFrames( const Frames& frames );
 
     // Sorted frames
@@ -38,9 +37,11 @@ public:
     int getFirst() const;
     int getLast() const;
 
-    bool operator==( const FrameRange& rhs ) {
-        return std::equal( this->getFrames().begin(),
-                           this->getFrames().begin() + this->getFrameCount(),
+    bool operator==( const FrameRange& rhs ) const {
+        const Frames lhsFrames = this->getFrames();
+        const std::size_t lhsFrameCount = this->getFrameCount();
+        return std::equal( lhsFrames.begin(),
+                           lhsFrames.begin() + lhsFrameCount,
                            rhs.getFrames().begin() );
     }
 

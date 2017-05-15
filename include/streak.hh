@@ -24,16 +24,19 @@ public:
     ~Streak() {}
     explicit Streak( const std::string& directory,
                      const std::string& name,
+                     const Padding& padding,
                      const FrameRange& range,
                      const std::string& extension );
 
     std::string getDirectory() const;
     std::string getName() const;
+    Padding getPadding() const;
     FrameRange getRange() const;
     std::string getExtension() const;
 
     void setDirectory( const std::string& directory );
     void setName( const std::string& name );
+    void setPadding( const Padding& padding );
     void setRange( const FrameRange& range );
     void setExtension( const std::string& extension );
 
@@ -70,6 +73,7 @@ private:
 
     std::string m_directory;
     std::string m_name;
+    Padding m_padding;
     FrameRange m_range;
     std::string m_extension;
 
