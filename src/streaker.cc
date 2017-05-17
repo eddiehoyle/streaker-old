@@ -38,7 +38,6 @@ bool parse( const std::string& string,
 
 Streak findStreak( const std::string& pattern_path ) {
 
-
     fs::path path( pattern_path );
     if ( fs::is_directory( pattern_path ) ) {
         std::cerr << "Expected file path, got directory: " << pattern_path << std::endl;
@@ -102,8 +101,6 @@ Streak Streaker::find( const std::string& name,
         ++dirIterBegin;
     }
 
-
-    Streak source;
     Streak target( m_directory.string(),
                   name,
                   Padding( padding ),
@@ -114,81 +111,19 @@ Streak Streaker::find( const std::string& name,
                                       this,
                                       paths.begin(),
                                       paths.end(),
-                                      std::ref( target ),
-                                      std::ref( source ) );
+                                      target );
 
     if ( worker.joinable() ) {
         worker.join();
     }
 
-//    std::cerr << "Streaks: " << streaks.size() << std::endl;
-
-//
-//    // Make sure the iterators are sequential
-//    const long length = paths.size();
-//
-//    // Amount of hardware threads available
-//    const unsigned long numThreads = std::thread::hardware_concurrency();
-//
-//    // How many numbers to process in each thread
-//    const unsigned long chunk = length / numThreads;
-//
-//    std::cerr << "Length: " << length << std::endl;
-//    std::cerr << "Chunk: " << chunk << std::endl;
-
-//    std::vector< std::thread > threads( numThreads );
-
-
-//    Paths::iterator chunkStartIter = paths.begin();
-//    for ( std::size_t threadIndex = 0;
-//          threadIndex < numThreads;
-//          ++threadIndex ) {
-//
-//        std::cerr << threadIndex << std::endl;
-//
-//        Paths::iterator chunkEndIter = chunkStartIter;
-//        std::advance( chunkEndIter, chunk );
-//
-//        // Store thread
-//        threads[threadIndex] = std::thread( &Streaker::run,
-//                                            this,
-//                                            chunkStartIter,
-//                                            chunkEndIter,
-//                                            streak );
-//
-//        // Next thread chunk
-//        chunkStartIter = chunkEndIter;
-//    }
-//
-//    printf( "Joining threads: %lu\n", threads.size() );
-//    for ( std::vector< std::thread >::iterator threadIter;
-//          threadIter != threads.end();
-//          ++threadIter ) {
-//        if ( threadIter->joinable() ) {
-//            threadIter->join();
-//        }
-//    }
-
-
-//    if ( matches.empty() ) {
-//        std::cerr << "No matches found for pattern: name="
-//                  << name
-//                  << ", padding="
-//                  << Padding( padding ).getFill()
-//                  << ", extension="
-//                  << extension << std::endl;
-//        return Streak();
-//    }
-
-//    std::cerr << "Found matches: " << matches.size() << std::endl;
-
+    print( m_streak );
     return Streak();
 }
 
 void Streaker::run( Paths::iterator iterBegin,
                     Paths::iterator iterLast,
-                    Streak& source,
-                    Streak& target ) {
+                    Streak target ) {
 
     // Make sure the iterators are sequential
     const long length = std::distance( iterBegin, iterLast );
@@ -218,6 +153,14 @@ void Streaker::run( Paths::iterator iterBegin,
                 continue;
             }
 
+//            printf( "Matching: %s == %s, %s == %s, %s == %s\n",
+//                    checkExtension.c_str(),
+//                    extension.c_str(),
+//                    checkName.c_str(),
+//                    name.c_str(),
+//                    checkPadding.c_str(),
+//                    checkPadding.c_str()
+//            );
             // Check target
             if ( checkExtension != extension ||
                  checkName != name ||
@@ -225,7 +168,6 @@ void Streaker::run( Paths::iterator iterBegin,
                 ++iterBegin;
                 continue;
             }
-
 
             int frame = std::stoi( checkPadding.c_str() );
             frames.push_back( frame );
@@ -240,5 +182,11 @@ void Streaker::run( Paths::iterator iterBegin,
     for ( auto& frame: frames ) {
         range.addFrame( frame );
     }
-    source.setRange( range );
+
+    m_streak.setDirectory( target.getDirectory() );
+    m_streak.setName( target.getName() );
+    m_streak.setPadding( target.getPadding() );
+    m_streak.setRange( range );
+    m_streak.setExtension( target.getExtension() );
+
 }

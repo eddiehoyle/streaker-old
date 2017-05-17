@@ -52,7 +52,7 @@ void FrameRange::addFrame( int frame ) {
         return;
     }
 
-    if ( std::find( m_frames.begin(), m_frames.end(), frame ) != m_frames.end() ) {
+    if ( std::find( m_frames.begin(), m_frames.end(), frame ) == m_frames.end() ) {
         m_frames.push_back( frame );
         setDirty( true );
         return;
@@ -63,11 +63,17 @@ std::size_t FrameRange::getFrameCount() const {
     return m_frames.size();
 }
 
-int FrameRange::getFirst() const {
+int FrameRange::getFirst() {
+    if ( isDirty() ) {
+        update();
+    }
     return m_first;
 }
 
-int FrameRange::getLast() const {
+int FrameRange::getLast() {
+    if ( isDirty() ) {
+        update();
+    }
     return m_last;
 }
 

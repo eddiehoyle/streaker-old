@@ -9,6 +9,7 @@ int main( int argc, char** argv ) {
 
     const std::string test = "/Users/eddiehoyle/Code/cpp/streaker/resources/test.####.txt";
     findStreak( test );
+
 //    const std::string blah = "/Users/eddiehoyle/Code/cpp/streaker/resources/blah.####.txt";
 //    findStreak( blah );
 

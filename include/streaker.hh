@@ -49,8 +49,9 @@ public:
     // Scan a directory iterator for a streak type
     void run( Paths::iterator iterBegin,
               Paths::iterator iterLast,
-              Streak& source,
-              Streak& target );
+              Streak target );
+
+    Streak m_streak;
 
 private:
 

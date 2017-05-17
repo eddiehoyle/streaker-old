@@ -34,8 +34,8 @@ public:
 
     std::size_t getFrameCount() const;
 
-    int getFirst() const;
-    int getLast() const;
+    int getFirst();
+    int getLast();
 
     bool operator==( const FrameRange& rhs ) const {
         const Frames lhsFrames = this->getFrames();

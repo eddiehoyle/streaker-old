@@ -14,6 +14,8 @@
 class Streak;
 typedef std::vector< Streak > Streaks;
 
+void print( const Streak& streak );
+
 class Streak {
 
     /* Represents a file path with a frame range */
@@ -27,6 +29,8 @@ public:
                      const Padding& padding,
                      const FrameRange& range,
                      const std::string& extension );
+
+    Streak( const Streak& streak );
 
     std::string getDirectory() const;
     std::string getName() const;
@@ -56,14 +60,6 @@ public:
 
     bool operator!=( const Streak& rhs ) {
         return !( *this == rhs );
-    }
-
-    void print() const {
-        printf( "Streak(name='%s', range=(%d, %d), extension='%s')\n",
-                getName().c_str(),
-                getRange().getFirst(),
-                getRange().getLast(),
-                getExtension().c_str() );
     }
 
 private:
