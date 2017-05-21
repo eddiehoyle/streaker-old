@@ -7,6 +7,7 @@
 
 #include <boost/filesystem.hpp>
 #include <thread>
+#include <mutex>
 
 #include "defs.hh"
 #include "streak.hh"
@@ -51,15 +52,48 @@ public:
               Paths::iterator iterLast,
               Streak target );
 
-    Streak m_streak;
 
 private:
 
     boost::filesystem::path m_directory;
 
+    // Temp
+    Streak m_streak;
     Streaks m_streaks;
+
     std::vector< std::thread > m_threads;
 
+};
+
+class StreakDispatcher;
+
+void process( Paths::iterator iterBegin,
+              Paths::iterator iterLast,
+              Streaks targets,
+              StreakDispatcher* dispatch ) {
+}
+
+class StreakDispatcher {
+
+    StreakDispatcher( const std::string& directory, const Streaks& targets )
+            : m_threads(),
+              m_streaks(),
+              m_mutex() {
+
+        Paths paths;
+        std::thread thread = std::thread( &process, paths.begin(), paths.end(),  targets, this );
+    }
+
+    void add( const Streak& streak ) {
+        m_mutex.lock();
+        m_streaks.push_back( streak );
+        m_mutex.unlock();
+    }
+
+private:
+    std::vector< std::thread > m_threads;
+    Streaks m_streaks;
+    std::mutex m_mutex;
 };
 
 

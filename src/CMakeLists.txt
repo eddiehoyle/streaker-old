@@ -12,7 +12,7 @@ if(Boost_FOUND)
 
     include_directories(${Boost_INCLUDE_DIRS})
 
-    add_library(streak SHARED streaker.cc streak.cc range.cc padding.cc)
+    add_library(streak SHARED streaker.cc streak.cc range.cc padding.cc ../include/status.hh)
     target_include_directories(
             streak PUBLIC
             ${STREAKER_INCLUDE_DIR}

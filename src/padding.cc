@@ -6,6 +6,9 @@
 #include <padding.hh>
 #include <algorithm>
 
+#include <boost/algorithm/string/predicate.hpp>
+
+
 bool is_number( const std::string& pattern ) {
     std::string::const_iterator iter = pattern.begin();
     while ( iter != pattern.end() && std::isdigit( *iter ) ) {
@@ -27,9 +30,11 @@ Padding::~Padding() {
 Padding::Padding( const std::string& pattern ) {
 
     if ( is_number( pattern ) || is_hash( pattern ) ) {
-        // TODO
-        //  Shield from INT_MAX overflow
-        m_fill = pattern.size();
+
+        // If string starts with 0, we know the padding size
+        if ( strncmp( pattern.c_str(), "0", 1 ) == 0 ) {
+            m_fill = ( int )pattern.size();
+        }
     } else {
         m_fill = -1;
     }

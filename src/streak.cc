@@ -19,6 +19,12 @@ void print( const Streak& streak ) {
             streak.getExtension().c_str() );
 }
 
+void print( const StreakProxy& proxy) {
+    printf( "Streak(name='%s', extension='%s')\n",
+            proxy.getName().c_str(),
+            proxy.getExtension().c_str() );
+}
+
 Streak::Streak( const std::string& directory,
                 const std::string& name,
                 const Padding& padding,
@@ -77,10 +83,6 @@ void Streak::setRange( const FrameRange& range ) {
 
 void Streak::setExtension( const std::string& extension ) {
     m_extension = extension;
-}
-
-std::string Streak::getFrame( const std::string& frame ) {
-    return std::string();
 }
 
 std::string Streak::getFrame( int frame ) {

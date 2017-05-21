@@ -14,25 +14,43 @@
 namespace xp = boost::xpressive;
 namespace fs = boost::filesystem;
 
-bool parse( const std::string& string,
+bool parse( const std::string& filepath,
             const std::string& pattern,
-            std::string& id,
+            std::string& name,
             std::string& padding,
             std::string& extension ) {
 
     xp::sregex rx = xp::sregex::compile( pattern );
     xp::smatch match;
 
-    fs::path path( string );
+    fs::path path( filepath );
 
     bool result = false;
     if ( xp::regex_search( path.filename().string(), match, rx ) ) {
-        id = match["name"];
+        name = match["name"];
         padding = match["padding"];
         extension = match["extension"];
         result = true;
     }
     return result;
+}
+
+Paths listDirectory( const fs::path directory ) {
+
+    Paths paths;
+    if ( !fs::is_directory( directory ) ) {
+        std::cerr << "Invalid directory: " << directory << std::endl;
+        return paths;
+    }
+
+    // File vector with paths
+    fs::directory_iterator dirIterBegin( directory );
+    fs::directory_iterator dirIterEnd;
+    while ( dirIterBegin != dirIterEnd ) {
+        paths.push_back( dirIterBegin->path() );
+        ++dirIterBegin;
+    }
+    return paths;
 }
 
 
@@ -124,6 +142,10 @@ Streak Streaker::find( const std::string& name,
 void Streaker::run( Paths::iterator iterBegin,
                     Paths::iterator iterLast,
                     Streak target ) {
+
+    /* TODO
+     *
+     */
 
     // Make sure the iterators are sequential
     const long length = std::distance( iterBegin, iterLast );

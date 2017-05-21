@@ -11,10 +11,45 @@
 #include "range.hh"
 #include "padding.hh"
 
+
 class Streak;
+class StreakProxy;
+
 typedef std::vector< Streak > Streaks;
 
 void print( const Streak& streak );
+void print( const StreakProxy& proxy );
+
+class StreakProxy {
+
+public:
+    StreakProxy( const std::string& name,
+                 const std::string& extension )
+            : m_name( name ),
+              m_extension( extension ) {
+    }
+
+    operator bool() const {
+        return !( m_name.empty() && m_extension.empty() );
+    }
+
+    bool operator==( const StreakProxy& rhs ) const {
+        return ( this->getName() == rhs.getName() &&
+                 this->getExtension() == rhs.getExtension() );
+    }
+
+    const std::string& getName() const {
+        return m_name;
+    }
+
+    const std::string& getExtension() const {
+        return m_extension;
+    }
+private:
+    std::string m_name;
+    std::string m_extension;
+};
+
 
 class Streak {
 
@@ -38,14 +73,14 @@ public:
     FrameRange getRange() const;
     std::string getExtension() const;
 
+    std::string getFrame( int frame );
+
     void setDirectory( const std::string& directory );
     void setName( const std::string& name );
     void setPadding( const Padding& padding );
     void setRange( const FrameRange& range );
     void setExtension( const std::string& extension );
 
-    std::string getFrame( const std::string& frame );
-    std::string getFrame( int frame );
 
     operator bool() const {
         return !( m_name.empty() || m_extension.empty() );
@@ -72,9 +107,6 @@ private:
     Padding m_padding;
     FrameRange m_range;
     std::string m_extension;
-
-
-
 };
 
 #endif //STREAKER_STREAK_HH

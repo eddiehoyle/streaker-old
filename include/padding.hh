@@ -16,7 +16,6 @@ class Padding {
 
     /*
      * Represents padding fill value
-     *
      */
 
 public:
@@ -30,7 +29,7 @@ public:
     }
 
     bool operator==( const Padding& rhs ) const {
-        return this->getFill() == rhs.getFill();
+        return this->getFill() >= rhs.getFill();
     }
 
     int getFill() const;
