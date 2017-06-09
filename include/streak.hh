@@ -18,38 +18,6 @@ class StreakProxy;
 typedef std::vector< Streak > Streaks;
 
 void print( const Streak& streak );
-void print( const StreakProxy& proxy );
-
-class StreakProxy {
-
-public:
-    StreakProxy( const std::string& name,
-                 const std::string& extension )
-            : m_name( name ),
-              m_extension( extension ) {
-    }
-
-    operator bool() const {
-        return !( m_name.empty() && m_extension.empty() );
-    }
-
-    bool operator==( const StreakProxy& rhs ) const {
-        return ( this->getName() == rhs.getName() &&
-                 this->getExtension() == rhs.getExtension() );
-    }
-
-    const std::string& getName() const {
-        return m_name;
-    }
-
-    const std::string& getExtension() const {
-        return m_extension;
-    }
-private:
-    std::string m_name;
-    std::string m_extension;
-};
-
 
 class Streak {
 
@@ -61,7 +29,6 @@ public:
     ~Streak() {}
     explicit Streak( const std::string& directory,
                      const std::string& name,
-                     const Padding& padding,
                      const FrameRange& range,
                      const std::string& extension );
 

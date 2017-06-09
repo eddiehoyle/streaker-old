@@ -6,13 +6,16 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(STREAKER_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(STREAKER_INCLUDE_DIR ${STREAKER_ROOT_DIR}/include)
 set(STREAKER_SRC_DIR ${STREAKER_ROOT_DIR}/src)
-set(STREAKER_PYSRC_DIR ${STREAKER_ROOT_DIR}/src/pystreak)
 set(STREAKER_LIB_DIR ${STREAKER_ROOT_DIR}/lib)
 set(STREAKER_BIN_DIR ${STREAKER_ROOT_DIR}/bin)
+set(STREAKER_EXTERNAL_DIR ${STREAKER_ROOT_DIR}/external)
+set(STREAKER_TEST_DIR ${STREAKER_ROOT_DIR}/tests)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${STREAKER_LIB_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${STREAKER_LIB_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${STREAKER_BIN_DIR})
+
+set(CMAKE_BINARY_DIR ${STREAKER_BIN_DIR})
 
 # Make a .so output!
 if(APPLE)
@@ -20,10 +23,13 @@ if(APPLE)
 endif(APPLE)
 
 find_package(Boost 1.45.0 COMPONENTS filesystem regex )
-#find_package(Boost 1.45.0 COMPONENTS filesystem regex python )
 find_package(PythonLibs 2.7 REQUIRED)
 
+include_directories(${STREAKER_INCLUDE_DIR})
+
+# This asshole breaks this gtest include bullshit
 add_subdirectory(${STREAKER_SRC_DIR})
 
-# Python wrapper
-#add_subdirectory(${STREAKER_PYSRC_DIR})
+
+add_subdirectory(${STREAKER_EXTERNAL_DIR})
+add_subdirectory(${STREAKER_TEST_DIR})

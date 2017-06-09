@@ -11,28 +11,28 @@
 namespace xp = boost::xpressive;
 
 void print( const Streak& streak ) {
-    printf( "Streak(name='%s', range=(%d, %d), padding=%d, extension='%s')\n",
+    printf( "Streak(name='%s', range=(%d, %d), frames=%lu, padding=%d, extension='%s')\n",
             streak.getName().c_str(),
             streak.getRange().getFirst(),
             streak.getRange().getLast(),
+            streak.getRange().getFrames().size(),
             streak.getPadding().getFill(),
             streak.getExtension().c_str() );
 }
 
-void print( const StreakProxy& proxy) {
-    printf( "Streak(name='%s', extension='%s')\n",
-            proxy.getName().c_str(),
-            proxy.getExtension().c_str() );
-}
+//void print( const StreakProxy& proxy) {
+//    printf( "Streak(name='%s', extension='%s')\n",
+//            proxy.getName().c_str(),
+//            proxy.getExtension().c_str() );
+//}
 
 Streak::Streak( const std::string& directory,
                 const std::string& name,
-                const Padding& padding,
                 const FrameRange& range,
                 const std::string& extension )
         : m_directory( directory ),
           m_name( name ),
-          m_padding( padding ),
+          m_padding(),
           m_range( range ),
           m_extension( extension ) {
 }

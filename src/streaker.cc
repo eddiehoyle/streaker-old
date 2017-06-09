@@ -2,17 +2,27 @@
 
 #include <thread>
 #include <iostream>
+#include <string>
 #include <vector>
 #include <algorithm>
+#include <cmath>
+
+#include <frame.hh>
 
 #include <boost/regex.hpp>
 #include <boost/xpressive/xpressive.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/range/iterator_range.hpp>
+#include <boost/lexical_cast.hpp>
+#include <stdexcept>
 
 namespace xp = boost::xpressive;
 namespace fs = boost::filesystem;
+
+unsigned int getNumberOfDigits( unsigned int i ) {
+    return i > 0 ? ( int )log10( ( double )i ) + 1 : 1;
+}
 
 bool parse( const std::string& filepath,
             const std::string& pattern,
@@ -54,11 +64,11 @@ Paths listDirectory( const fs::path directory ) {
 }
 
 
-Streak findStreak( const std::string& pattern_path ) {
+Streak findStreak( const std::string& filepath ) {
 
-    fs::path path( pattern_path );
-    if ( fs::is_directory( pattern_path ) ) {
-        std::cerr << "Expected file path, got directory: " << pattern_path << std::endl;
+    fs::path path( filepath );
+    if ( fs::is_directory( filepath ) ) {
+        std::cerr << "Expected file path, got directory: " << filepath << std::endl;
         return Streak();
     }
 
@@ -69,12 +79,13 @@ Streak findStreak( const std::string& pattern_path ) {
         return Streak();
     }
 
-//    std::cerr << "Extracted: name=" << name << ", padding=" << padding << ", ext=" << extension << std::endl;
-
-    Streaker streaker;
-    streaker.setDirectory( path.parent_path().string() );
+    Streaker streaker( path.parent_path().string() );
     Streak streak = streaker.find( name, padding, extension );
     return streak;
+}
+
+Streaker::Streaker( const std::string& directory )
+        : m_directory( directory ) {
 }
 
 void Streaker::setDirectory( const std::string& directory ) {
@@ -86,15 +97,27 @@ void Streaker::setDirectory( const std::string& directory ) {
     m_directory = fs::path( directory );
 }
 
-Streak Streaker::find( const std::string& name,
+Streak Streaker::find( const std::string& seekName,
                        const std::string& padding,
-                       const std::string& extension ) {
+                       const std::string& seekExtension ) {
+    return find( seekName, Padding::fromPattern( padding ), seekExtension );
+}
+
+Streak Streaker::find( const std::string& seekName,
+                       unsigned int padding,
+                       const std::string& seekExtension ) {
+    return find( seekName, Padding( padding, kAmbiguous ), seekExtension );
+}
+
+Streak Streaker::find( const std::string& seekName,
+                       const Padding& padding,
+                       const std::string& seekExtension ) {
 
     // Is name and extension valid?
-    if ( name.empty() || extension.empty() ) {
+    if ( seekName.empty() || seekExtension.empty() ) {
         std::cerr << "Streak name and extension invalid: name="
-        << name << ", extension="
-        << extension << std::endl;
+                  << seekName << ", extension="
+                  << seekExtension << std::endl;
     }
 
     // Is the directory valid?
@@ -109,71 +132,107 @@ Streak Streaker::find( const std::string& name,
         return Streak();
     }
 
-    // Collect all paths that match
-    fs::directory_iterator dirIterBegin( m_directory );
-    fs::directory_iterator dirIterEnd;
+    // List all paths in directory
+    Paths paths = listDirectory( m_directory );
+    std::sort( paths.begin(), paths.end() );
 
-    Paths paths;
-    while ( dirIterBegin != dirIterEnd ) {
-        paths.push_back( dirIterBegin->path() );
-        ++dirIterBegin;
-    }
-
-    Streak target( m_directory.string(),
-                  name,
-                  Padding( padding ),
-                  FrameRange(),
-                  extension );
-
-    std::thread worker = std::thread( &Streaker::run,
-                                      this,
-                                      paths.begin(),
-                                      paths.end(),
-                                      target );
-
-    if ( worker.joinable() ) {
-        worker.join();
-    }
-
-    print( m_streak );
-    return Streak();
-}
-
-void Streaker::run( Paths::iterator iterBegin,
-                    Paths::iterator iterLast,
-                    Streak target ) {
-
-    /* TODO
+    /*
+     * Loop through filenames
+     * Need to check padding values
+     * Does 0001 == 01?
+     * What is min/max padding found for streak?
      *
      */
 
-    // Make sure the iterators are sequential
-    const long length = std::distance( iterBegin, iterLast );
-    if ( length <= 0 ) {
-        return;
+//    typedef std::pair< int, unsigned int > PaddedFrame;
+    std::vector< Frame > frames;
+
+    // Loop through paths, extract frames
+    for ( const fs::path& path: paths ) {
+
+        // Read filename
+        std::string checkName, checkFrame, checkExtension;
+        if ( !parse( path.filename().string(),
+                     SIMPLE,
+                     checkName,
+                     checkFrame,
+                     checkExtension ) ) {
+            continue;
+        }
+
+        Padding parsedPadding = Padding::fromPattern( checkFrame );
+
+
+//        print( checkPadding );
+//        print( padding );
+        bool result = ( padding == parsedPadding );
+        printf( "Padding match: fill=%d, state=%d, result=%d\n",
+                parsedPadding.getFill(),
+                parsedPadding.getState(),
+                result );
+
+        // Match names
+        if ( seekName == checkName &&
+             padding == parsedPadding &&
+             seekExtension == checkExtension ) {
+            int frame = boost::lexical_cast< int >( checkFrame );
+            frames.push_back( Frame( frame, padding ) );
+        }
     }
 
-    Frames frames;
+    printf( "Frames: %lu\n", frames.size() );
+    for ( auto& frame: frames ) {
+        print( frame );
+    }
 
-    const std::string& name = target.getName();
-    const Padding& padding = target.getPadding();
-    const std::string& extension = target.getExtension();
+    // Collect frames
+    FrameRange range;
+    range.setFrames( frames );
 
-    while ( iterBegin != iterLast ) {
+    Streak streak( m_directory.string(),
+                   seekName,
+                   range,
+                   seekExtension );
 
-        // Found a file
-        if ( fs::is_regular_file( *iterBegin ) ) {
+    print( streak );
+    return streak;
+}
 
-            // Read filename
-            std::string checkName, checkPadding, checkExtension;
-            if ( !parse( iterBegin->filename().string(),
-                         SIMPLE,
-                         checkName,
-                         checkPadding,
-                         checkExtension ) ) {
-                ++iterBegin;
-                continue;
-            }
+//void Streaker::run( Paths::iterator iterBegin,
+//                    Paths::iterator iterLast,
+//                    StreakProxy target ) {
+//
+//    /* TODO
+//     *
+//     */
+//
+//    // Make sure the iterators are sequential
+//    const long length = std::distance( iterBegin, iterLast );
+//    if ( length <= 0 ) {
+//        return;
+//    }
+//
+//    Frames frames;
+//
+//    const std::string& name = target.getName();
+//    const Padding& padding = target.getPadding();
+//    const std::string& extension = target.getExtension();
+//
+//    while ( iterBegin != iterLast ) {
+//
+//        // Found a file
+//        if ( fs::is_regular_file( *iterBegin ) ) {
+//
+//            // Read filename
+//            std::string checkName, checkPadding, checkExtension;
+//            if ( !parse( iterBegin->filename().string(),
+//                         SIMPLE,
+//                         checkName,
+//                         checkPadding,
+//                         checkExtension ) ) {
+//                ++iterBegin;
+//                continue;
+//            }
 
 //            printf( "Matching: %s == %s, %s == %s, %s == %s\n",
 //                    checkExtension.c_str(),
@@ -183,32 +242,32 @@ void Streaker::run( Paths::iterator iterBegin,
 //                    checkPadding.c_str(),
 //                    checkPadding.c_str()
 //            );
-            // Check target
-            if ( checkExtension != extension ||
-                 checkName != name ||
-                 Padding( checkPadding ) != Padding( padding ) ) {
-                ++iterBegin;
-                continue;
-            }
+// Check target
+//            if ( checkExtension != extension ||
+//                 checkName != name ||
+//                 Padding::fromPattern( checkPadding ) != Padding::fromPattern( padding ) ) {
+//                ++iterBegin;
+//                continue;
+//            }
 
-            int frame = std::stoi( checkPadding.c_str() );
-            frames.push_back( frame );
-
-            // Increment
-            ++iterBegin;
-        }
-    }
-
-    // Update streak
-    FrameRange range;
-    for ( auto& frame: frames ) {
-        range.addFrame( frame );
-    }
-
-    m_streak.setDirectory( target.getDirectory() );
-    m_streak.setName( target.getName() );
-    m_streak.setPadding( target.getPadding() );
-    m_streak.setRange( range );
-    m_streak.setExtension( target.getExtension() );
-
-}
+//            int frame = std::stoi( checkPadding.c_str() );
+//            frames.push_back( frame );
+//
+//            // Increment
+//            ++iterBegin;
+//        }
+//    }
+//
+//    // Update streak
+//    FrameRange range;
+//    for ( auto& frame: frames ) {
+//        range.addFrame( frame );
+//    }
+//
+//    m_streak.setDirectory( target.getDirectory() );
+//    m_streak.setName( target.getName() );
+//    m_streak.setPadding( target.getPadding() );
+//    m_streak.setRange( range );
+//    m_streak.setExtension( target.getExtension() );
+//
+//}

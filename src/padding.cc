@@ -8,43 +8,86 @@
 
 #include <boost/algorithm/string/predicate.hpp>
 
-
-bool is_number( const std::string& pattern ) {
-    std::string::const_iterator iter = pattern.begin();
-    while ( iter != pattern.end() && std::isdigit( *iter ) ) {
-        ++iter;
-    }
-    return !pattern.empty() && iter == pattern.end();
+// Temp
+int add( int a, int b ) {
+    return a + b;
 }
 
-bool is_hash( const std::string& pattern ) {
-    return pattern.size() == std::count( pattern.begin(), pattern.end(), '#');
-}
-
-Padding::Padding() {
-}
-
-Padding::~Padding() {
-}
-
-Padding::Padding( const std::string& pattern ) {
-
-    if ( is_number( pattern ) || is_hash( pattern ) ) {
-
-        // If string starts with 0, we know the padding size
-        if ( strncmp( pattern.c_str(), "0", 1 ) == 0 ) {
-            m_fill = ( int )pattern.size();
+unsigned int extractPadding( const std::string& frame, PaddingState& state ) {
+    unsigned int padding = 0;
+    if ( isNumber( frame ) ) {
+        if ( strncmp( frame.c_str(), "0", 1 ) == 0 ) {
+            padding = ( unsigned int )frame.size();
+            state = kZeroFilled;
+        } else {
+            padding = ( unsigned int )frame.size();
+            state = kRaw;
         }
-    } else {
-        m_fill = -1;
+    } else if ( isHash( frame ) ) {
+        padding = ( unsigned int )( frame.size() * 4 );
+        state = kAmbiguous;
+    } else if ( isAt( frame ) ) {
+        padding = ( unsigned int )( frame.size() );
+        state = kAmbiguous;
+    }
+    return padding;
+}
+
+bool isNumber( const std::string& string ) {
+    return std::all_of( string.begin(),
+                        string.end(),
+                        ::isdigit );
+}
+
+bool isHash( const std::string& string ) {
+    return std::all_of( string.begin(),
+                        string.end(),
+                        []( char c ){ return c == '#'; } );
+}
+
+bool isAt( const std::string& string ) {
+    return std::all_of( string.begin(),
+                        string.end(),
+                        []( char c ){ return c == '@'; } );
+}
+
+void print( const Padding& padding ) {
+    printf( "Padding(fill=%d)\n", padding.getFill() );
+}
+
+Padding Padding::fromPattern( const std::string& pattern ) {
+    PaddingState state;
+    unsigned int fill = extractPadding( pattern, state );
+    return Padding( fill, state );
+}
+
+Padding::Padding( unsigned int fill, PaddingState state )
+        : m_fill( fill ),
+          m_state( state ) {
+}
+
+void Padding::setState( PaddingState state ) {
+    switch( state ) {
+        case kAmbiguous:
+        case kRaw:
+            m_state = state;
+            m_fill = 1;
+        case kZeroFilled:
+            m_state = state;
+        default:
+            ;
     }
 }
 
-Padding::Padding( int fill ) {
+PaddingState Padding::getState() const {
+    return m_state;
+}
+
+void Padding::setFill( unsigned int fill ) {
     m_fill = fill;
 }
 
-int Padding::getFill() const {
+unsigned int Padding::getFill() const {
     return m_fill;
 }
 

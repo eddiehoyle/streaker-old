@@ -7,8 +7,10 @@
 
 #include <vector>
 #include <algorithm>
+#include <frame.hh>
 
-typedef std::vector< int > Frames;
+//typedef std::vector< int > Frames;
+typedef std::vector< Frame > Frames;
 
 class FrameRange;
 
@@ -23,7 +25,8 @@ class FrameRange {
 
 public:
     FrameRange();
-    explicit FrameRange( int first, int last );
+    explicit FrameRange( int first, int last, unsigned int padding );
+    explicit FrameRange( const Frames& frames );
     ~FrameRange();
 
     void addFrame( int frame );

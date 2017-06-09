@@ -39,6 +39,8 @@ class Streaker {
 
 public:
 
+    explicit Streaker( const std::string& directory );
+
     void setDirectory( const std::string& directory );
 
     /// Scan a directory for a named streak
@@ -46,12 +48,19 @@ public:
                  const std::string& padding,
                  const std::string& extension );
 
+    Streak find( const std::string& name,
+                 unsigned int padding,
+                 const std::string& extension );
+
+    Streak find( const std::string& name,
+                 const Padding& padding,
+                 const std::string& extension );
+
 
     // Scan a directory iterator for a streak type
     void run( Paths::iterator iterBegin,
               Paths::iterator iterLast,
               Streak target );
-
 
 private:
 
@@ -67,28 +76,19 @@ private:
 
 class StreakDispatcher;
 
-void process( Paths::iterator iterBegin,
-              Paths::iterator iterLast,
-              Streaks targets,
-              StreakDispatcher* dispatch ) {
-}
+class StreakWorker {
+
+public:
+    StreakWorker( StreakDispatcher& dispatcher );
+};
 
 class StreakDispatcher {
 
-    StreakDispatcher( const std::string& directory, const Streaks& targets )
-            : m_threads(),
-              m_streaks(),
-              m_mutex() {
+    friend class StreakWorker;
 
-        Paths paths;
-        std::thread thread = std::thread( &process, paths.begin(), paths.end(),  targets, this );
-    }
+public:
 
-    void add( const Streak& streak ) {
-        m_mutex.lock();
-        m_streaks.push_back( streak );
-        m_mutex.unlock();
-    }
+    StreakDispatcher( const std::string& directory, const Streaks& targets );
 
 private:
     std::vector< std::thread > m_threads;
