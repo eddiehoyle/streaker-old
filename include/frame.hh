@@ -1,6 +1,6 @@
-//
-// Created by Eddie Hoyle on 25/05/17.
-//
+////
+//// Created by Eddie Hoyle on 25/05/17.
+////
 
 #ifndef STREAKER_FRAME_HH
 #define STREAKER_FRAME_HH
@@ -11,30 +11,54 @@
 
 #include <padding.hh>
 
-class Frame;
+typedef std::pair< int, Padding > FramePair;
 
-void print( const Frame& frame );
-
-class Frame {
-
-public:
-
-    explicit Frame( int frame, unsigned int padding = 0 );
-    explicit Frame( int frame, const Padding& padding );
-
-    int getFrame() const;
-    Padding getPadding() const;
-
-    int toInt() const;
-    std::string toString() const;
-
-    bool operator==( const Frame& rhs ) const;
-
-
-private:
-
-    int m_frame;
-    Padding m_padding;
-};
+bool operator==( const FramePair& lhs, const FramePair& rhs );
+bool operator!=( const FramePair& lhs, const FramePair& rhs );
+bool operator<( const FramePair& lhs, const FramePair& rhs );
+bool operator<=( const FramePair& lhs, const FramePair& rhs );
+bool operator>( const FramePair& lhs, const FramePair& rhs );
+bool operator>=( const FramePair& lhs, const FramePair& rhs );
 
 #endif //STREAKER_FRAME_HH
+
+
+
+
+
+
+
+
+//
+//class Frame;
+//
+//void print( const Frame& frame );
+//
+//std::string toString( const Frame& frame );
+
+
+
+
+//class Frame {
+//
+//public:
+//
+//    explicit Frame( int number, const Padding& padding );
+//
+//    int getNumber() const;
+//    Padding getPadding() const;
+//
+//    void setNumber( int number );
+//    void setPadding( const Padding& padding );
+//
+//    bool operator==( const Frame& rhs ) const;
+//    bool operator!=( const Frame& rhs ) const;
+////    bool operator<( const Frame& rhs ) const;
+////    bool operator>( const Frame& rhs ) const;
+//
+//private:
+//
+//    int m_number;
+//    Padding m_padding;
+//};
+//

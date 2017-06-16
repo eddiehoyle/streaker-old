@@ -10,7 +10,6 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 file(GLOB SOURCE_FILES "*.cc")
 add_library(streak SHARED ${SOURCE_FILES})
-message(WARNING ${SOURCE_FILES})
 target_include_directories(streak PUBLIC ${STREAKER_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
 target_link_libraries(streak PUBLIC ${Boost_LIBRARIES})
 

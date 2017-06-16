@@ -7,20 +7,35 @@
 
 #include <string>
 
-int add( int a, int b );
-
-enum PaddingState {
+// New
+enum PaddingType {
     kAmbiguous,
-    kRaw,
-    kZeroFilled
+    kFilled
 };
 
-unsigned int extractPadding( const std::string& frame, PaddingState& state );
-bool isNumber( const std::string& string );
-bool isHash( const std::string& pattern );
-bool isAt( const std::string& pattern );
-
 class Padding;
+
+Padding extract( const std::string& frame );
+
+
+
+inline bool isNumber( const std::string& pattern ) {
+    return std::all_of( pattern.begin(),
+                        pattern.end(),
+                        ::isdigit );
+}
+
+inline bool isHash( const std::string& pattern ) {
+    return std::all_of( pattern.begin(),
+                        pattern.end(),
+                        []( char c ){ return c == '#'; } );
+}
+
+inline bool isAt( const std::string& pattern ) {
+    return std::all_of( pattern.begin(),
+                        pattern.end(),
+                        []( char c ){ return c == '@'; } );
+}
 
 void print( const Padding& padding );
 
@@ -31,66 +46,78 @@ class Padding {
      */
 
 public:
-    static Padding fromPattern( const std::string& pattern );
+    Padding();
+    explicit Padding( unsigned int fill, PaddingType state = kAmbiguous );
 
-public:
-    Padding() {}
-    ~Padding() {}
-    explicit Padding( unsigned int fill, PaddingState state = kAmbiguous );
+    ~Padding();
 
     void setFill( unsigned int fill );
-    void setState( PaddingState state );
+    void setState( PaddingType state );
 
     unsigned int getFill() const;
-    PaddingState getState() const;
+    PaddingType getState() const;
 
-    operator bool() const {
-        return m_fill > 0;
-    }
-
-    // Examples:
-    // 1   == 101 // false
-    // 101 == 003 // true
     bool operator==( const Padding& rhs ) const {
-        const PaddingState lhsState = getState();
-        const PaddingState rhsState = rhs.getState();
-
-        // Eg: 1, 101
-        if ( lhsState == kRaw || lhsState == kAmbiguous ) {
-
-            // Eg: 2, 102
-            if ( rhsState == kRaw || rhsState == kAmbiguous ) {
-                return true;
-            }
-
-            // Eg: 101, 101
-            if ( rhsState == kZeroFilled ) {
-                return getFill() == rhs.getFill();
-            }
-        }
-
-        // Eg: 001
-        if ( lhsState == kZeroFilled ) {
-
-            // Eg: 001, 101
-            if ( rhsState == kAmbiguous ) {
-                return getFill() <= rhs.getFill();
-            }
-
-            // Eg: 001, 101;
-            if ( rhsState == kZeroFilled ) {
-                return getFill() == rhs.getFill();
-            }
-        }
-        return false;
+        return getFill() == rhs.getFill() &&
+               getState() == rhs.getState();
     }
+    bool operator!=( const Padding& rhs ) const {
+        return getFill() != rhs.getFill() &&
+               getState() != rhs.getState();
+    }
+    bool operator<( const Padding& rhs ) const {
+        return getFill() < rhs.getFill();
+    }
+    bool operator<=( const Padding& rhs ) const {
+        return getFill() <= rhs.getFill();
+    }
+    bool operator>( const Padding& rhs ) const {
+        return getFill() > rhs.getFill();
+    }
+    bool operator>=( const Padding& rhs ) const {
+        return getFill() >= rhs.getFill();
+    }
+
+//    // Examples:
+//    // 1   == 101 // false
+//    // 101 == 003 // true
+//    bool operator==( const Padding& rhs ) const {
+//        const PaddingType lhsState = getState();
+//        const PaddingType rhsState = rhs.getState();
+//
+//        // Eg: 1, 101
+//        if ( lhsState == kRaw || lhsState == kAmbiguous ) {
+//
+//            // Eg: 2, 102
+//            if ( rhsState == kRaw || rhsState == kAmbiguous ) {
+//                return true;
+//            }
+//
+//            // Eg: 101, 101
+//            if ( rhsState == kZeroFilled ) {
+//                return getFill() == rhs.getFill();
+//            }
+//        }
+//
+//        // Eg: 001
+//        if ( lhsState == kZeroFilled ) {
+//
+//            // Eg: 001, 101
+//            if ( rhsState == kAmbiguous ) {
+//                return getFill() <= rhs.getFill();
+//            }
+//
+//            // Eg: 001, 101;
+//            if ( rhsState == kZeroFilled ) {
+//                return getFill() == rhs.getFill();
+//            }
+//        }
+//        return false;
+//    }
 
 private:
     unsigned int m_fill;
-    PaddingState m_state;
-
+    PaddingType m_state;
 };
-
-
 
 #endif //STREAKER_PADDING_HH

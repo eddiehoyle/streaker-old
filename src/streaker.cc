@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include <frame.hh>
+#include <range.hh>
 
 #include <boost/regex.hpp>
 #include <boost/xpressive/xpressive.hpp>
@@ -100,7 +100,8 @@ void Streaker::setDirectory( const std::string& directory ) {
 Streak Streaker::find( const std::string& seekName,
                        const std::string& padding,
                        const std::string& seekExtension ) {
-    return find( seekName, Padding::fromPattern( padding ), seekExtension );
+    const Padding _padding = extract( padding );
+    return find( seekName, _padding, seekExtension );
 }
 
 Streak Streaker::find( const std::string& seekName,
@@ -145,7 +146,8 @@ Streak Streaker::find( const std::string& seekName,
      */
 
 //    typedef std::pair< int, unsigned int > PaddedFrame;
-    std::vector< Frame > frames;
+//    std::vector< Frame > frames;
+    FrameSet frames;
 
     // Loop through paths, extract frames
     for ( const fs::path& path: paths ) {
@@ -160,8 +162,7 @@ Streak Streaker::find( const std::string& seekName,
             continue;
         }
 
-        Padding parsedPadding = Padding::fromPattern( checkFrame );
-
+        Padding parsedPadding = extract( checkFrame );
 
 //        print( checkPadding );
 //        print( padding );
@@ -176,14 +177,11 @@ Streak Streaker::find( const std::string& seekName,
              padding == parsedPadding &&
              seekExtension == checkExtension ) {
             int frame = boost::lexical_cast< int >( checkFrame );
-            frames.push_back( Frame( frame, padding ) );
+            frames.insert( FramePair( frame, padding ) );
         }
     }
 
     printf( "Frames: %lu\n", frames.size() );
-    for ( auto& frame: frames ) {
-        print( frame );
-    }
 
     // Collect frames
     FrameRange range;

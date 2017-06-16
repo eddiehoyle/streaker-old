@@ -7,63 +7,43 @@
 
 #include <vector>
 #include <algorithm>
-#include <frame.hh>
+#include <set>
+#include <map>
 
-//typedef std::vector< int > Frames;
-typedef std::vector< Frame > Frames;
+#include <padding.hh>
+#include <frame.hh>
 
 class FrameRange;
 
-class FrameRange {
+typedef std::map< int, Padding > FrameMap;
+typedef std::set< FramePair > FrameSet;
 
-    /*
-     * Represents a frame range for a sequence of paths
-     *
-     * Notes:
-     * 1. may contain skipped frames, eg: evens, odds, every 5th
-     * */
+class FrameRange {
 
 public:
     FrameRange();
-    explicit FrameRange( int first, int last, unsigned int padding );
-    explicit FrameRange( const Frames& frames );
-    ~FrameRange();
+    explicit FrameRange( int first, int last, const Padding& padding );
+    explicit FrameRange( const FrameSet& frames );
 
-    void addFrame( int frame );
-    void setFrames( const Frames& frames );
+    void addFrame( int frame, const Padding& padding );
+    void addFrame( const FramePair& frame );
 
-    // Sorted frames
-    Frames getFrames() const;
+    void setFrames( const FrameSet& frames );
+    FrameSet getFrames() const;
 
-    std::size_t getFrameCount() const;
+    std::size_t getCount() const;
 
-    int getFirst();
-    int getLast();
+    int getFirst() const;
+    int getLast() const;
 
-    bool operator==( const FrameRange& rhs ) const {
-        const Frames lhsFrames = this->getFrames();
-        const std::size_t lhsFrameCount = this->getFrameCount();
-        return std::equal( lhsFrames.begin(),
-                           lhsFrames.begin() + lhsFrameCount,
-                           rhs.getFrames().begin() );
+    bool operator==( const FrameRange& range ) const {
+        return true;
     }
-
-private:
-    void setDirty( bool state );
-    bool isDirty() const;
-    void update();
 
 private:
 
     // Frames vector
-    Frames m_frames;
-
-    // Cache important frames
-    int m_first;
-    int m_last;
-
-    // Frames vector updated state
-    bool m_isDirty;
+    FrameMap m_frames;
 
 };
 

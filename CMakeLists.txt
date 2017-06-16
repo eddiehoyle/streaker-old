@@ -27,9 +27,6 @@ find_package(PythonLibs 2.7 REQUIRED)
 
 include_directories(${STREAKER_INCLUDE_DIR})
 
-# This asshole breaks this gtest include bullshit
 add_subdirectory(${STREAKER_SRC_DIR})
-
-
 add_subdirectory(${STREAKER_EXTERNAL_DIR})
 add_subdirectory(${STREAKER_TEST_DIR})
