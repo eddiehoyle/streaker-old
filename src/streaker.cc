@@ -98,20 +98,13 @@ void Streaker::setDirectory( const std::string& directory ) {
 }
 
 Streak Streaker::find( const std::string& seekName,
-                       const std::string& padding,
+                       const std::string& seekPadding,
                        const std::string& seekExtension ) {
-    const Padding _padding = extract( padding );
-    return find( seekName, _padding, seekExtension );
+    return find( seekName, extract( seekPadding ), seekExtension );
 }
 
 Streak Streaker::find( const std::string& seekName,
                        unsigned int padding,
-                       const std::string& seekExtension ) {
-    return find( seekName, Padding( padding, kAmbiguous ), seekExtension );
-}
-
-Streak Streaker::find( const std::string& seekName,
-                       const Padding& padding,
                        const std::string& seekExtension ) {
 
     // Is name and extension valid?
@@ -162,22 +155,22 @@ Streak Streaker::find( const std::string& seekName,
             continue;
         }
 
-        Padding parsedPadding = extract( checkFrame );
+        unsigned int fill = extract( checkFrame );
 
 //        print( checkPadding );
 //        print( padding );
-        bool result = ( padding == parsedPadding );
-        printf( "Padding match: fill=%d, state=%d, result=%d\n",
-                parsedPadding.getFill(),
-                parsedPadding.getState(),
-                result );
+        bool result = ( padding == fill );
+//        printf( "Padding match: fill=%d, state=%d, result=%d\n",
+//                parsedPadding.getFill(),
+//                parsedPadding.getState(),
+//                result );
 
         // Match names
         if ( seekName == checkName &&
-             padding == parsedPadding &&
+             padding == fill &&
              seekExtension == checkExtension ) {
             int frame = boost::lexical_cast< int >( checkFrame );
-            frames.insert( FramePair( frame, padding ) );
+//            frames.insert( FramePair( frame, padding ) );
         }
     }
 
@@ -185,11 +178,12 @@ Streak Streaker::find( const std::string& seekName,
 
     // Collect frames
     FrameRange range;
-    range.setFrames( frames );
+//    range.setFrames( frames );
 
     Streak streak( m_directory.string(),
                    seekName,
                    range,
+                   0,
                    seekExtension );
 
     print( streak );

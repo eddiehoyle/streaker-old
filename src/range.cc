@@ -7,46 +7,27 @@
 #include <vector>
 
 FrameRange::FrameRange()
-        : m_frames() {
-}
+        : m_frames() {}
 
-FrameRange::FrameRange( int first, int last, const Padding& padding )
+FrameRange::FrameRange( int first, int last )
         : m_frames() {
 
     if ( first > last ) {
         return;
     }
 
-    int frame = first;
-    while ( frame < last ) {
-        m_frames[ first ] = padding;
-        frame++;
-    }
+    for ( int frame = first; frame < last; ++frame )
+        m_frames.insert( m_frames.end(), frame );
 }
 
-FrameRange::FrameRange( const FrameSet& frames )
-        : m_frames() {
-    for ( const FramePair& pair : frames ) {
-        m_frames[ pair.first ] = pair.second;
-    }
-}
+FrameRange::~FrameRange() {}
 
-void FrameRange::addFrame( int frame, const Padding& padding ) {
-    m_frames[ frame ] = padding;
-}
-
-void FrameRange::setFrames( const FrameSet& frames ) {
-    for ( const FramePair& pair : frames ) {
-        m_frames[ pair.first ] = pair.second;
-    }
+void FrameRange::addFrame( int frame ) {
+    m_frames.insert( frame );
 }
 
 FrameSet FrameRange::getFrames() const {
-    FrameSet frames;
-    for ( const FramePair& pair : m_frames ) {
-        frames.insert( pair );
-    }
-    return frames;
+    return m_frames;
 }
 
 std::size_t FrameRange::getCount() const {
@@ -54,9 +35,13 @@ std::size_t FrameRange::getCount() const {
 }
 
 int FrameRange::getFirst() const {
-    return m_frames.begin()->first;
+    return !m_frames.empty() ? *m_frames.begin() : 0;
 }
 
 int FrameRange::getLast() const {
-    return m_frames.rbegin()->first;
+    return !m_frames.empty() ? *m_frames.rbegin() : 0;
+}
+
+bool FrameRange::operator==( const FrameRange& rhs ) const {
+    return getFrames() == rhs.getFrames();
 }

@@ -52,10 +52,6 @@ public:
                  unsigned int padding,
                  const std::string& extension );
 
-    Streak find( const std::string& name,
-                 const Padding& padding,
-                 const std::string& extension );
-
 
     // Scan a directory iterator for a streak type
     void run( Paths::iterator iterBegin,

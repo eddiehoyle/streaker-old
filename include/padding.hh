@@ -7,17 +7,18 @@
 
 #include <string>
 
-// New
 enum PaddingType {
     kAmbiguous,
     kFilled
 };
 
-class Padding;
-
-Padding extract( const std::string& frame );
-
-
+inline unsigned int getNumberOfDigits( int number ) {
+    unsigned int length = 1;
+    while ( number /= 10 ) {
+        length++;
+    }
+    return length;
+}
 
 inline bool isNumber( const std::string& pattern ) {
     return std::all_of( pattern.begin(),
@@ -37,87 +38,18 @@ inline bool isAt( const std::string& pattern ) {
                         []( char c ){ return c == '@'; } );
 }
 
-void print( const Padding& padding );
-
-class Padding {
-
-    /*
-     * Represents padding fill value
-     */
-
-public:
-    Padding();
-    explicit Padding( unsigned int fill, PaddingType state = kAmbiguous );
-
-    ~Padding();
-
-    void setFill( unsigned int fill );
-    void setState( PaddingType state );
-
-    unsigned int getFill() const;
-    PaddingType getState() const;
-
-    bool operator==( const Padding& rhs ) const {
-        return getFill() == rhs.getFill() &&
-               getState() == rhs.getState();
+inline unsigned int extract( const std::string& frame ) {
+    unsigned int padding = 0;
+    if ( isNumber( frame ) ) {
+        if ( strncmp( frame.c_str(), "0", 1 ) == 0 ) {
+            padding = ( unsigned int )frame.size();
+        }
+    } else if ( isHash( frame ) ) {
+        padding = ( unsigned int )( frame.size() * 4 );
+    } else if ( isAt( frame ) ) {
+        padding = ( unsigned int )( frame.size() );
     }
-    bool operator!=( const Padding& rhs ) const {
-        return getFill() != rhs.getFill() &&
-               getState() != rhs.getState();
-    }
-    bool operator<( const Padding& rhs ) const {
-        return getFill() < rhs.getFill();
-    }
-    bool operator<=( const Padding& rhs ) const {
-        return getFill() <= rhs.getFill();
-    }
-    bool operator>( const Padding& rhs ) const {
-        return getFill() > rhs.getFill();
-    }
-    bool operator>=( const Padding& rhs ) const {
-        return getFill() >= rhs.getFill();
-    }
-
-//    // Examples:
-//    // 1   == 101 // false
-//    // 101 == 003 // true
-//    bool operator==( const Padding& rhs ) const {
-//        const PaddingType lhsState = getState();
-//        const PaddingType rhsState = rhs.getState();
-//
-//        // Eg: 1, 101
-//        if ( lhsState == kRaw || lhsState == kAmbiguous ) {
-//
-//            // Eg: 2, 102
-//            if ( rhsState == kRaw || rhsState == kAmbiguous ) {
-//                return true;
-//            }
-//
-//            // Eg: 101, 101
-//            if ( rhsState == kZeroFilled ) {
-//                return getFill() == rhs.getFill();
-//            }
-//        }
-//
-//        // Eg: 001
-//        if ( lhsState == kZeroFilled ) {
-//
-//            // Eg: 001, 101
-//            if ( rhsState == kAmbiguous ) {
-//                return getFill() <= rhs.getFill();
-//            }
-//
-//            // Eg: 001, 101;
-//            if ( rhsState == kZeroFilled ) {
-//                return getFill() == rhs.getFill();
-//            }
-//        }
-//        return false;
-//    }
-
-private:
-    unsigned int m_fill;
-    PaddingType m_state;
-};
+    return padding;
+}
 
 #endif //STREAKER_PADDING_HH

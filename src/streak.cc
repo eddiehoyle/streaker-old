@@ -16,23 +16,18 @@ void print( const Streak& streak ) {
             streak.getRange().getFirst(),
             streak.getRange().getLast(),
             streak.getRange().getFrames().size(),
-            streak.getPadding().getFill(),
+            streak.getPadding(),
             streak.getExtension().c_str() );
 }
-
-//void print( const StreakProxy& proxy) {
-//    printf( "Streak(name='%s', extension='%s')\n",
-//            proxy.getName().c_str(),
-//            proxy.getExtension().c_str() );
-//}
 
 Streak::Streak( const std::string& directory,
                 const std::string& name,
                 const FrameRange& range,
+                unsigned int padding,
                 const std::string& extension )
         : m_directory( directory ),
           m_name( name ),
-          m_padding(),
+          m_padding( padding ),
           m_range( range ),
           m_extension( extension ) {
 }
@@ -53,7 +48,7 @@ std::string Streak::getName() const {
     return m_name;
 }
 
-Padding Streak::getPadding() const {
+unsigned int Streak::getPadding() const {
     return m_padding;
 }
 
@@ -73,7 +68,7 @@ void Streak::setName( const std::string& name ) {
     m_name = name;
 }
 
-void Streak::setPadding( const Padding& padding ) {
+void Streak::setPadding( unsigned int padding ) {
     m_padding = padding;
 }
 
@@ -83,8 +78,4 @@ void Streak::setRange( const FrameRange& range ) {
 
 void Streak::setExtension( const std::string& extension ) {
     m_extension = extension;
-}
-
-std::string Streak::getFrame( int frame ) {
-    return std::string();
 }
