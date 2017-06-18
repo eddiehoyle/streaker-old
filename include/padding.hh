@@ -8,8 +8,8 @@
 #include <string>
 
 enum PaddingType {
-    kAmbiguous,
-    kFilled
+    kAmbiguous = 0,
+    kFilled    = 1
 };
 
 inline unsigned int getNumberOfDigits( int number ) {
@@ -38,18 +38,29 @@ inline bool isAt( const std::string& pattern ) {
                         []( char c ){ return c == '@'; } );
 }
 
-inline unsigned int extract( const std::string& frame ) {
+inline unsigned int extractPadding( const std::string& frame ) {
     unsigned int padding = 0;
     if ( isNumber( frame ) ) {
-        if ( strncmp( frame.c_str(), "0", 1 ) == 0 ) {
-            padding = ( unsigned int )frame.size();
-        }
+        padding = ( unsigned int )frame.size();
     } else if ( isHash( frame ) ) {
         padding = ( unsigned int )( frame.size() * 4 );
     } else if ( isAt( frame ) ) {
         padding = ( unsigned int )( frame.size() );
     }
+//    printf( "Extracted padding %d from frame: '%s'\n", padding, frame.c_str() );
     return padding;
+}
+
+inline PaddingType getPaddingType( int frame, unsigned int padding ) {
+
+    PaddingType type;
+    unsigned int digits = getNumberOfDigits( frame );
+    if ( padding <= digits ) {
+        type = kAmbiguous;
+    } else {
+        type = kFilled;
+    }
+    return type;
 }
 
 #endif //STREAKER_PADDING_HH

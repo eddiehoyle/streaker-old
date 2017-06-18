@@ -39,58 +39,46 @@ class Streaker {
 
 public:
 
+
     explicit Streaker( const std::string& directory );
 
     void setDirectory( const std::string& directory );
 
     /// Scan a directory for a named streak
     Streak find( const std::string& name,
-                 const std::string& padding,
-                 const std::string& extension );
-
-    Streak find( const std::string& name,
                  unsigned int padding,
                  const std::string& extension );
 
-
-    // Scan a directory iterator for a streak type
-    void run( Paths::iterator iterBegin,
-              Paths::iterator iterLast,
-              Streak target );
+//    // Scan a directory iterator for a streak type
+//    void run( Paths::iterator iterBegin,
+//              Paths::iterator iterLast,
+//              Streak target );
 
 private:
-
     boost::filesystem::path m_directory;
-
-    // Temp
-    Streak m_streak;
-    Streaks m_streaks;
-
-    std::vector< std::thread > m_threads;
-
 };
 
-class StreakDispatcher;
-
-class StreakWorker {
-
-public:
-    StreakWorker( StreakDispatcher& dispatcher );
-};
-
-class StreakDispatcher {
-
-    friend class StreakWorker;
-
-public:
-
-    StreakDispatcher( const std::string& directory, const Streaks& targets );
-
-private:
-    std::vector< std::thread > m_threads;
-    Streaks m_streaks;
-    std::mutex m_mutex;
-};
+//class StreakDispatcher;
+//
+//class StreakWorker {
+//
+//public:
+//    StreakWorker( StreakDispatcher& dispatcher );
+//};
+//
+//class StreakDispatcher {
+//
+//    friend class StreakWorker;
+//
+//public:
+//
+//    StreakDispatcher( const std::string& directory, const Streaks& targets );
+//
+//private:
+//    std::vector< std::thread > m_threads;
+//    Streaks m_streaks;
+//    std::mutex m_mutex;
+//};
 
 
 #endif //STREAKER_STREAKER_HH_HH

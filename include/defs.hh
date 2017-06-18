@@ -7,7 +7,10 @@
 
 #include <vector>
 
-static const char* SEQUENCE = "(?P<name>\\w+)[\\.|_](?P<padding>[@#]+)(?P<extension>\\.\\w+)$";
-static const char* SIMPLE = "(?P<name>\\w+)[\\.|_](?P<padding>[\\-|\\+]?[0-9]+)(?P<extension>\\.\\w+)$";
+/// # or @ sequence
+static const char* SEQUENCE = "(?P<name>\\w+)[\\.|_](?P<frame>[@#]+)(?P<extension>\\.\\w+)$";
+
+/// Numbered frame
+static const char* FRAME = "(?P<name>\\w+)[\\.|_](?P<frame>[\\-|\\+]?[0-9]+)(?P<extension>\\.\\w+)$";
 
 #endif //STREAKER_DEFS_HH_HH

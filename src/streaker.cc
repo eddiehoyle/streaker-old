@@ -20,25 +20,24 @@
 namespace xp = boost::xpressive;
 namespace fs = boost::filesystem;
 
-unsigned int getNumberOfDigits( unsigned int i ) {
-    return i > 0 ? ( int )log10( ( double )i ) + 1 : 1;
-}
-
-bool parse( const std::string& filepath,
+bool parse( const std::string& path,
             const std::string& pattern,
             std::string& name,
-            std::string& padding,
+            std::string& frame,
             std::string& extension ) {
+
+    const fs::path filepath( path );
 
     xp::sregex rx = xp::sregex::compile( pattern );
     xp::smatch match;
 
-    fs::path path( filepath );
-
+    // TODO
+    //  This is silly. We're expecting named captures on an input pattern
+    //  that could be anything. Fix this.
     bool result = false;
-    if ( xp::regex_search( path.filename().string(), match, rx ) ) {
+    if ( xp::regex_search( filepath.filename().string(), match, rx ) ) {
         name = match["name"];
-        padding = match["padding"];
+        frame = match["frame"];
         extension = match["extension"];
         result = true;
     }
@@ -63,7 +62,6 @@ Paths listDirectory( const fs::path directory ) {
     return paths;
 }
 
-
 Streak findStreak( const std::string& filepath ) {
 
     fs::path path( filepath );
@@ -73,13 +71,16 @@ Streak findStreak( const std::string& filepath ) {
     }
 
     // Check pattern
-    std::string name, padding, extension;
-    if ( !parse( path.filename().string(), SEQUENCE, name, padding, extension ) ) {
+    std::string name, frame, extension;
+    if ( !parse( path.filename().string(), SEQUENCE, name, frame, extension ) ) {
         std::cerr << "Invalid pattern: " << path << std::endl;
         return Streak();
     }
 
-    Streaker streaker( path.parent_path().string() );
+    unsigned int padding = extractPadding( frame );
+
+    const std::string directory = path.parent_path().string();
+    Streaker streaker( directory );
     Streak streak = streaker.find( name, padding, extension );
     return streak;
 }
@@ -89,34 +90,25 @@ Streaker::Streaker( const std::string& directory )
 }
 
 void Streaker::setDirectory( const std::string& directory ) {
-
-    if ( !fs::is_directory( fs::path( directory ) ) ) {
-        std::cerr << "Invalid directory: " << directory << std::endl;
-        return;
-    }
     m_directory = fs::path( directory );
 }
 
-Streak Streaker::find( const std::string& seekName,
-                       const std::string& seekPadding,
-                       const std::string& seekExtension ) {
-    return find( seekName, extract( seekPadding ), seekExtension );
-}
-
-Streak Streaker::find( const std::string& seekName,
+Streak Streaker::find( const std::string& name,
                        unsigned int padding,
-                       const std::string& seekExtension ) {
+                       const std::string& extension ) {
+
+    printf( "Looking for padding: %d\n\n", padding );
 
     // Is name and extension valid?
-    if ( seekName.empty() || seekExtension.empty() ) {
-        std::cerr << "Streak name and extension invalid: name="
-                  << seekName << ", extension="
-                  << seekExtension << std::endl;
+    if ( name.empty() || extension.empty() ) {
+        std::cerr << "Streak name or extension invalid: name="
+                  << name << ", extension="
+                  << extension << std::endl;
     }
 
     // Is the directory valid?
-    if ( m_directory.empty() ) {
-        std::cerr << "Directory not set." << std::endl;
+    if ( !fs::is_directory( m_directory ) ) {
+        std::cerr << "Invalid directory: " << m_directory.string() << std::endl;
         return Streak();
     }
 
@@ -128,6 +120,9 @@ Streak Streaker::find( const std::string& seekName,
 
     // List all paths in directory
     Paths paths = listDirectory( m_directory );
+
+    // TODO
+    //  Do I need to sort paths?
     std::sort( paths.begin(), paths.end() );
 
     /*
@@ -135,11 +130,8 @@ Streak Streaker::find( const std::string& seekName,
      * Need to check padding values
      * Does 0001 == 01?
      * What is min/max padding found for streak?
-     *
      */
 
-//    typedef std::pair< int, unsigned int > PaddedFrame;
-//    std::vector< Frame > frames;
     FrameSet frames;
 
     // Loop through paths, extract frames
@@ -148,43 +140,47 @@ Streak Streaker::find( const std::string& seekName,
         // Read filename
         std::string checkName, checkFrame, checkExtension;
         if ( !parse( path.filename().string(),
-                     SIMPLE,
+                     FRAME,
                      checkName,
                      checkFrame,
                      checkExtension ) ) {
             continue;
         }
 
-        unsigned int fill = extract( checkFrame );
+        int frame = boost::lexical_cast< int >( checkFrame );
+        unsigned int checkPadding = extractPadding( checkFrame );
 
-//        print( checkPadding );
-//        print( padding );
-        bool result = ( padding == fill );
-//        printf( "Padding match: fill=%d, state=%d, result=%d\n",
-//                parsedPadding.getFill(),
-//                parsedPadding.getState(),
-//                result );
+        PaddingType type = getPaddingType( frame, checkPadding );
+
+//        printf( "%s == %s: %d\n", seekName.c_str(), checkName.c_str(), ( seekName == checkName ) );
+//        printf( "%d == %d: %d\n", padding, checkPadding, ( padding == checkPadding ) );
+//        printf( "%s == %s: %d\n", seekExtension.c_str(), checkExtension.c_str(), ( seekExtension == checkExtension ) );
+//        printf( "Frame=%d, checkPadding=%d, PaddingType=%d\n", frame, checkPadding, type );
 
         // Match names
-        if ( seekName == checkName &&
-             padding == fill &&
-             seekExtension == checkExtension ) {
-            int frame = boost::lexical_cast< int >( checkFrame );
-//            frames.insert( FramePair( frame, padding ) );
-        }
-    }
+        if ( name == checkName &&
+                ( ( padding == checkPadding && type == kFilled ) ||
+                ( padding <= checkPadding && type == kAmbiguous ) ) &&
+             extension == checkExtension ) {
 
-    printf( "Frames: %lu\n", frames.size() );
+            // Store frame
+            frames.insert( frame );
+            printf( "Found match: %s\n", path.filename().string().c_str() );
+        }
+        printf( "\n" );
+    }
 
     // Collect frames
     FrameRange range;
-//    range.setFrames( frames );
+    for ( int frame : frames ) {
+        range.addFrame( frame );
+    }
 
     Streak streak( m_directory.string(),
-                   seekName,
+                   name,
                    range,
-                   0,
-                   seekExtension );
+                   padding,
+                   extension );
 
     print( streak );
     return streak;
