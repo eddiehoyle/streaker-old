@@ -77,7 +77,8 @@ Streak findStreak( const std::string& filepath ) {
         return Streak();
     }
 
-    unsigned int padding = extractPadding( frame );
+    unsigned int padding;
+    extractPadding( frame, padding );
 
     const std::string directory = path.parent_path().string();
     Streaker streaker( directory );
@@ -148,7 +149,8 @@ Streak Streaker::find( const std::string& name,
         }
 
         int frame = boost::lexical_cast< int >( checkFrame );
-        unsigned int checkPadding = extractPadding( checkFrame );
+        unsigned int checkPadding;
+        extractPadding( checkFrame, checkPadding );
 
         PaddingType type = getPaddingType( frame, checkPadding );
 

@@ -38,17 +38,22 @@ inline bool isAt( const std::string& pattern ) {
                         []( char c ){ return c == '@'; } );
 }
 
-inline unsigned int extractPadding( const std::string& frame ) {
-    unsigned int padding = 0;
+inline bool extractPadding( const std::string& frame, unsigned int& padding ) {
+
+    if ( frame.empty() ) {
+        return false;
+    }
+
     if ( isNumber( frame ) ) {
         padding = ( unsigned int )frame.size();
     } else if ( isHash( frame ) ) {
         padding = ( unsigned int )( frame.size() * 4 );
     } else if ( isAt( frame ) ) {
         padding = ( unsigned int )( frame.size() );
+    } else {
+        return false;
     }
-//    printf( "Extracted padding %d from frame: '%s'\n", padding, frame.c_str() );
-    return padding;
+    return true;
 }
 
 inline PaddingType getPaddingType( int frame, unsigned int padding ) {
