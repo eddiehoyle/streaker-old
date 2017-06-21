@@ -20,47 +20,7 @@
 namespace xp = boost::xpressive;
 namespace fs = boost::filesystem;
 
-bool parse( const std::string& path,
-            const std::string& pattern,
-            std::string& name,
-            std::string& frame,
-            std::string& extension ) {
-
-    const fs::path filepath( path );
-
-    xp::sregex rx = xp::sregex::compile( pattern );
-    xp::smatch match;
-
-    // TODO
-    //  This is silly. We're expecting named captures on an input pattern
-    //  that could be anything. Fix this.
-    bool result = false;
-    if ( xp::regex_search( filepath.filename().string(), match, rx ) ) {
-        name = match["name"];
-        frame = match["frame"];
-        extension = match["extension"];
-        result = true;
-    }
-    return result;
-}
-
-Paths listDirectory( const fs::path directory ) {
-
-    Paths paths;
-    if ( !fs::is_directory( directory ) ) {
-        std::cerr << "Invalid directory: " << directory << std::endl;
-        return paths;
-    }
-
-    // File vector with paths
-    fs::directory_iterator dirIterBegin( directory );
-    fs::directory_iterator dirIterEnd;
-    while ( dirIterBegin != dirIterEnd ) {
-        paths.push_back( dirIterBegin->path() );
-        ++dirIterBegin;
-    }
-    return paths;
-}
+Paths listDirectory( const fs::path directory );
 
 Streak findStreak( const std::string& filepath ) {
 
@@ -124,7 +84,7 @@ Streak Streaker::find( const std::string& name,
 
     // TODO
     //  Do I need to sort paths?
-    std::sort( paths.begin(), paths.end() );
+//    std::sort( paths.begin(), paths.end() );
 
     /*
      * Loop through filenames
@@ -139,20 +99,21 @@ Streak Streaker::find( const std::string& name,
     for ( const fs::path& path: paths ) {
 
         // Read filename
-        std::string checkName, checkFrame, checkExtension;
+        std::string parseName, parseFrame, parseExtension;
         if ( !parse( path.filename().string(),
                      FRAME,
-                     checkName,
-                     checkFrame,
-                     checkExtension ) ) {
+                     parseName,
+                     parseFrame,
+                     parseExtension ) ) {
             continue;
         }
 
-        int frame = boost::lexical_cast< int >( checkFrame );
-        unsigned int checkPadding;
-        extractPadding( checkFrame, checkPadding );
+        unsigned int frame = boost::lexical_cast< unsigned int >( parseFrame );
 
-        PaddingType type = getPaddingType( frame, checkPadding );
+        unsigned int parsePadding;
+        extractPadding( parseFrame, parsePadding );
+
+        PaddingType type = getPaddingType( frame, parsePadding );
 
 //        printf( "%s == %s: %d\n", seekName.c_str(), checkName.c_str(), ( seekName == checkName ) );
 //        printf( "%d == %d: %d\n", padding, checkPadding, ( padding == checkPadding ) );
@@ -160,23 +121,19 @@ Streak Streaker::find( const std::string& name,
 //        printf( "Frame=%d, checkPadding=%d, PaddingType=%d\n", frame, checkPadding, type );
 
         // Match names
-        if ( name == checkName &&
-                ( ( padding == checkPadding && type == kFilled ) ||
-                ( padding <= checkPadding && type == kAmbiguous ) ) &&
-             extension == checkExtension ) {
+        if ( name == parseName &&
+                ( ( padding == parsePadding && type == kFilled ) ||
+                ( padding <= parsePadding && type == kAmbiguous ) ) &&
+             extension == parseExtension ) {
 
             // Store frame
             frames.insert( frame );
-            printf( "Found match: %s\n", path.filename().string().c_str() );
         }
-        printf( "\n" );
     }
 
     // Collect frames
     FrameRange range;
-    for ( int frame : frames ) {
-        range.addFrame( frame );
-    }
+    range.addFrames( frames );
 
     Streak streak( m_directory.string(),
                    name,
@@ -261,3 +218,45 @@ Streak Streaker::find( const std::string& name,
 //    m_streak.setExtension( target.getExtension() );
 //
 //}
+
+bool parse( const std::string& path,
+            const std::string& pattern,
+            std::string& name,
+            std::string& frame,
+            std::string& extension ) {
+
+    const fs::path filepath( path );
+
+    xp::sregex rx = xp::sregex::compile( pattern );
+    xp::smatch match;
+
+    // TODO
+    //  This is silly. We're expecting named captures on an input pattern
+    //  that could be anything. Fix this.
+    bool result = false;
+    if ( xp::regex_search( filepath.filename().string(), match, rx ) ) {
+        name = match["name"];
+        frame = match["frame"];
+        extension = match["extension"];
+        result = true;
+    }
+    return result;
+}
+
+Paths listDirectory( const fs::path directory ) {
+
+    Paths paths;
+    if ( !fs::is_directory( directory ) ) {
+        std::cerr << "Invalid directory: " << directory << std::endl;
+        return paths;
+    }
+
+    // File vector with paths
+    fs::directory_iterator dirIterBegin( directory );
+    fs::directory_iterator dirIterEnd;
+    while ( dirIterBegin != dirIterEnd ) {
+        paths.push_back( dirIterBegin->path() );
+        ++dirIterBegin;
+    }
+    return paths;
+}

@@ -9,7 +9,7 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 include_directories(${Boost_INCLUDE_DIRS})
 
 file(GLOB SOURCE_FILES "*.cc")
-add_library(streak SHARED ${SOURCE_FILES})
+add_library(streak SHARED ${SOURCE_FILES} ../include/parser.hh ../include/frame.hh frame.cc parser.cc)
 target_include_directories(streak PUBLIC ${STREAKER_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
 target_link_libraries(streak PUBLIC ${Boost_LIBRARIES})
 

@@ -9,21 +9,25 @@
 FrameRange::FrameRange()
         : m_frames() {}
 
-FrameRange::FrameRange( int first, int last )
+FrameRange::FrameRange( unsigned int first, unsigned int last )
         : m_frames() {
 
     if ( first > last ) {
         return;
     }
 
-    for ( int frame = first; frame < last; ++frame )
+    for ( unsigned int frame = first; frame < last; ++frame )
         m_frames.insert( m_frames.end(), frame );
 }
 
 FrameRange::~FrameRange() {}
 
-void FrameRange::addFrame( int frame ) {
+void FrameRange::addFrame( unsigned int frame ) {
     m_frames.insert( frame );
+}
+
+void FrameRange::addFrames( const FrameSet& frames ) {
+    m_frames = frames;
 }
 
 FrameSet FrameRange::getFrames() const {
@@ -34,11 +38,11 @@ std::size_t FrameRange::getCount() const {
     return m_frames.size();
 }
 
-int FrameRange::getFirst() const {
+unsigned int FrameRange::getFirst() const {
     return !m_frames.empty() ? *m_frames.begin() : 0;
 }
 
-int FrameRange::getLast() const {
+unsigned int FrameRange::getLast() const {
     return !m_frames.empty() ? *m_frames.rbegin() : 0;
 }
 

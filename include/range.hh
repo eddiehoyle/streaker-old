@@ -12,7 +12,7 @@
 
 #include <padding.hh>
 
-typedef std::set< int > FrameSet;
+typedef std::set< unsigned int > FrameSet;
 
 class FrameRange {
 
@@ -25,15 +25,16 @@ public:
     // TODO
     FrameRange();
     ~FrameRange();
-    explicit FrameRange( int first, int last );
+    explicit FrameRange( unsigned int first, unsigned int last );
 
-    void addFrame( int frame );
+    void addFrame( unsigned int frame );
+    void addFrames( const FrameSet& frames );
     FrameSet getFrames() const;
 
     std::size_t getCount() const;
 
-    int getFirst() const;
-    int getLast() const;
+    unsigned int getFirst() const;
+    unsigned int getLast() const;
 
     bool operator==( const FrameRange& rhs ) const;
 
