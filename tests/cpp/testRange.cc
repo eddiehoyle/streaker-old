@@ -16,15 +16,16 @@ TEST( TestRange, constructor ) {
 
 TEST( TestRange, explict_constructor ) {
 
-    FrameRange range( -5, 5 );
+    FrameRange range( 0, 5 );
 
-    unsigned int expectedCount = ( unsigned int )std::abs( -5 - 5 );
-    int expectedFirst = -5;
-    int expectedLast = 4;
+    unsigned int expectedCount = ( unsigned int )std::abs( 0 - 5 );
+    unsigned int expectedFirst = 0;
+    unsigned int expectedLast = 4;
 
     FrameSet expectedFrames;
-    for ( int frame = expectedFirst; frame < expectedLast + 1; ++frame )
+    for ( unsigned int frame = expectedFirst; frame < expectedLast + 1; ++frame ) {
         expectedFrames.insert( expectedFrames.end(), frame );
+    }
 
     EXPECT_EQ( range.getFrames(), expectedFrames ) << "Wrong frames";
     EXPECT_EQ( range.getCount(), expectedCount ) << "Wrong frame count";

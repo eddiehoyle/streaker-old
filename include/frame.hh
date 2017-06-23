@@ -9,23 +9,14 @@
 
 class Frame;
 
-bool parseFrame( const std::string& frameStr,
-                 unsigned int* frame,
-                 unsigned int* padding );
-
-bool parseFilename( const std::string& filename,
-                    std::string& name,
-                    std::string& padding,
-                    std::string& extension );
-
-bool fromFilename( const std::string& filepath, Frame& frame );
+void fromFilename( const std::string& filepath, Frame& frame );
 
 class Frame {
 
     explicit Frame( unsigned int frame, unsigned int padding );
     unsigned int getFrame() const;
     unsigned int getPadding() const;
-    PaddingType getType() const;
+//    PaddingType getType() const;
 
     bool operator==( const Frame& rhs ) const {
         return getFrame() == rhs.getFrame() &&

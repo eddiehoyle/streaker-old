@@ -38,7 +38,7 @@ Streak findStreak( const std::string& filepath ) {
     }
 
     unsigned int padding;
-    extractPadding( frame, padding );
+//    extractPadding( frame, padding );
 
     const std::string directory = path.parent_path().string();
     Streaker streaker( directory );
@@ -111,9 +111,9 @@ Streak Streaker::find( const std::string& name,
         unsigned int frame = boost::lexical_cast< unsigned int >( parseFrame );
 
         unsigned int parsePadding;
-        extractPadding( parseFrame, parsePadding );
+//        extractPadding( parseFrame, parsePadding );
 
-        PaddingType type = getPaddingType( frame, parsePadding );
+//        PaddingType type = getPaddingType( frame, parsePadding );
 
 //        printf( "%s == %s: %d\n", seekName.c_str(), checkName.c_str(), ( seekName == checkName ) );
 //        printf( "%d == %d: %d\n", padding, checkPadding, ( padding == checkPadding ) );
@@ -122,8 +122,8 @@ Streak Streaker::find( const std::string& name,
 
         // Match names
         if ( name == parseName &&
-                ( ( padding == parsePadding && type == kFilled ) ||
-                ( padding <= parsePadding && type == kAmbiguous ) ) &&
+                ( ( padding == parsePadding && !isAmbiguous( frame, parsePadding ) ) ||
+                ( padding <= parsePadding && isAmbiguous( frame, parsePadding ) ) ) &&
              extension == parseExtension ) {
 
             // Store frame

@@ -12,9 +12,9 @@ enum PaddingType {
     kFilled    = 1
 };
 
-inline unsigned int getNumberOfDigits( int number ) {
+inline unsigned int countDigits( unsigned int frame ) {
     unsigned int length = 1;
-    while ( number /= 10 ) {
+    while ( frame /= 10 ) {
         length++;
     }
     return length;
@@ -38,50 +38,8 @@ inline bool isAt( const std::string& pattern ) {
                         []( char c ){ return c == '@'; } );
 }
 
-inline bool extractPadding( const std::string& frame, unsigned int* padding ) {
-
-    if ( frame.empty() ) {
-        return false;
-    }
-
-    if ( isNumber( frame ) ) {
-        *padding = ( unsigned int )frame.size();
-    } else if ( isHash( frame ) ) {
-        *padding = ( unsigned int )( frame.size() * 4 );
-    } else if ( isAt( frame ) ) {
-        *padding = ( unsigned int )( frame.size() );
-    }
-    return padding != nullptr;
-}
-
-inline bool extractPadding( const std::string& frame, unsigned int& padding ) {
-
-    if ( frame.empty() ) {
-        return false;
-    }
-
-    if ( isNumber( frame ) ) {
-        padding = ( unsigned int )frame.size();
-    } else if ( isHash( frame ) ) {
-        padding = ( unsigned int )( frame.size() * 4 );
-    } else if ( isAt( frame ) ) {
-        padding = ( unsigned int )( frame.size() );
-    } else {
-        return false;
-    }
-    return true;
-}
-
-inline PaddingType getPaddingType( int frame, unsigned int padding ) {
-
-    PaddingType type;
-    unsigned int digits = getNumberOfDigits( frame );
-    if ( padding <= digits ) {
-        type = kAmbiguous;
-    } else {
-        type = kFilled;
-    }
-    return type;
+inline bool isAmbiguous( unsigned int frame, unsigned int padding ) {
+    return countDigits( frame ) >= padding;
 }
 
 #endif //STREAKER_PADDING_HH
