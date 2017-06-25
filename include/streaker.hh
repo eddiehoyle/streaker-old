@@ -12,11 +12,14 @@
 #include "defs.hh"
 #include "streak.hh"
 #include "range.hh"
+#include <path.hh>
+
 
 typedef std::vector< boost::filesystem::path > Paths;
 
-/// Find a streak on disk
-Streak findStreak( const std::string& pattern );
+/// TODO
+Streak findStreak( const SequencePath& path );
+Streak findStreak( const FramePath& path );
 
 /// Find streaks in a directory
 //Streaks findStreaks( const std::string& directory );
@@ -40,14 +43,16 @@ class Streaker {
 public:
 
 
-    explicit Streaker( const std::string& directory );
+//    explicit Streaker();
 
-    void setDirectory( const std::string& directory );
+//    void setDirectory( const std::string& directory );
 
     /// Scan a directory for a named streak
-    Streak find( const std::string& name,
-                 unsigned int padding,
-                 const std::string& extension );
+//    Streak find( const std::string& name,
+//                 unsigned int padding,
+//                 const std::string& extension );
+
+    Streak find( const SequencePath& sequence );
 
 //    // Scan a directory iterator for a streak type
 //    void run( Paths::iterator iterBegin,

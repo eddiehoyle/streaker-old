@@ -22,7 +22,7 @@ if(APPLE)
     set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
 endif(APPLE)
 
-find_package(Boost 1.45.0 COMPONENTS filesystem regex )
+find_package(Boost 1.45.0 COMPONENTS filesystem regex program_options)
 find_package(PythonLibs 2.7 REQUIRED)
 
 include_directories(${STREAKER_INCLUDE_DIR})

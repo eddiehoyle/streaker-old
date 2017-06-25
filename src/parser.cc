@@ -11,11 +11,11 @@
 
 namespace xp = boost::xpressive;
 
-bool parseFilename( const std::string& filename,
-                    std::string& name,
-                    unsigned int& frame,
-                    unsigned int& padding,
-                    std::string& extension ) {
+bool parseFrame( const std::string& filename,
+                 std::string& name,
+                 unsigned int& frame,
+                 unsigned int& padding,
+                 std::string& extension ) {
 
     xp::sregex rx( xp::sregex::compile( FRAME ) );
     xp::smatch match;

@@ -29,6 +29,7 @@ public:
 
     void addFrame( unsigned int frame );
     void addFrames( const FrameSet& frames );
+    void setFrames( const FrameSet& frames );
     FrameSet getFrames() const;
 
     std::size_t getCount() const;

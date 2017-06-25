@@ -4,7 +4,6 @@
 
 #include <range.hh>
 #include <numeric>
-#include <vector>
 
 FrameRange::FrameRange()
         : m_frames() {}
@@ -27,6 +26,10 @@ void FrameRange::addFrame( unsigned int frame ) {
 }
 
 void FrameRange::addFrames( const FrameSet& frames ) {
+    m_frames.insert( frames.begin(), frames.end() );
+}
+
+void FrameRange::setFrames( const FrameSet& frames ) {
     m_frames = frames;
 }
 

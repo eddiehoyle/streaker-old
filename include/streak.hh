@@ -6,14 +6,17 @@
 #define STREAKER_STREAK_HH
 
 #include <boost/filesystem.hpp>
+#include <boost/shared_ptr.hpp>
 #include <iostream>
 
 #include "range.hh"
 #include "padding.hh"
+#include <path.hh>
 
 
 class Streak;
-class StreakProxy;
+typedef boost::shared_ptr< Streak > StreakPtr;
+typedef std::vector< StreakPtr > StreakPtrs;
 
 typedef std::vector< Streak > Streaks;
 
@@ -33,6 +36,7 @@ public:
                      const FrameRange& range,
                      unsigned int padding,
                      const std::string& extension );
+    explicit Streak( const SequencePath& sequence, const FrameRange& range );
 
     Streak( const Streak& streak );
 

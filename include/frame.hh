@@ -16,7 +16,6 @@ class Frame {
     explicit Frame( unsigned int frame, unsigned int padding );
     unsigned int getFrame() const;
     unsigned int getPadding() const;
-//    PaddingType getType() const;
 
     bool operator==( const Frame& rhs ) const {
         return getFrame() == rhs.getFrame() &&
@@ -29,6 +28,10 @@ class Frame {
 private:
     unsigned int m_frame;
     unsigned int m_padding;
+};
+
+class Sequence {
+    explicit Sequence( unsigned int padding );
 };
 
 #endif //STREAKER_FRAME_HH

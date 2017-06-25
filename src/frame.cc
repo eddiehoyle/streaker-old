@@ -32,7 +32,3 @@ unsigned int Frame::getFrame() const {
 unsigned int Frame::getPadding() const {
     return m_padding;
 }
-
-//PaddingType Frame::getType() const {
-//    return getPaddingType( m_frame, m_padding );
-//}
