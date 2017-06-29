@@ -32,8 +32,8 @@ Streak::Streak( const std::string& directory,
           m_extension( extension ) {
 }
 
-Streak::Streak( const SequencePath& sequence, const FrameRange& range )
-        : m_directory( sequence.directory() ),
+Streak::Streak( const std::string& directory, const SequenceFile& sequence, const FrameRange& range )
+        : m_directory( directory ),
           m_name( sequence.name() ),
           m_padding( sequence.padding() ),
           m_range( range ),

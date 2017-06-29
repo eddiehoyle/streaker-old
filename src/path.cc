@@ -8,112 +8,185 @@
 #include <boost/filesystem.hpp>
 #include <padding.hh>
 
+#include <string>
+#include <iostream>
+#include <iomanip>
+#include <sstream>
+
 namespace fs = boost::filesystem;
 
-void print( const SequencePath& sequence ) {
-    printf( "SequencePath(directory='%s', name='%s', padding=%d, extension='%s')\n",
-            sequence.directory().c_str(),
+std::string format( const FrameFile& frame, const std::string& delimeter ) {
+
+    std::ostringstream stream;
+    stream << frame.name();
+    stream << delimeter;
+    stream << std::setfill( '0' ) << std::setw( frame.padding() ) << frame.frame();
+    stream << delimeter;
+
+    // Add '.' before extension
+    if ( delimeter.empty() ) {
+        stream << ".";
+    } else {
+        if ( delimeter.back() != '.' ) {
+            stream << ".";
+        }
+    }
+
+    stream << frame.extension();
+    return stream.str();
+}
+
+std::string format( const SequenceFile& sequence,
+                    unsigned int frame,
+                    const std::string& delimeter ) {
+
+    std::ostringstream stream;
+    stream << sequence.name();
+    stream << delimeter;
+    stream << std::setfill( '0' ) << std::setw( sequence.padding() ) << frame;
+    stream << delimeter;
+
+    // Add '.' before extension
+    if ( delimeter.empty() ) {
+        stream << ".";
+    } else {
+        if ( delimeter.back() != '.' ) {
+            stream << ".";
+        }
+    }
+
+    stream << sequence.extension();
+    return stream.str();
+}
+
+
+fs::path normalize( const fs::path& path ) {
+    fs::path normalized;
+    for ( const fs::path& segment : path ) {
+        if ( segment.string() == ".." ) {
+            normalized = normalized.parent_path();
+            continue;
+        }
+        normalized /= segment;
+    }
+    return normalized;
+}
+
+void print( const SequenceFile& sequence ) {
+    printf( "SequenceFile(name='%s', padding=%d, extension='%s')\n",
             sequence.name().c_str(),
             sequence.padding(),
             sequence.extension().c_str() );
 }
 
-void print( const FramePath& frame ) {
-    printf( "FramePath(directory='%s', name='%s', frame=%d, padding=%d, extension='%s')\n",
-            frame.directory().c_str(),
+void print( const FrameFile& frame ) {
+    printf( "FrameFile(name='%s', frame=%d, padding=%d, extension='%s')\n",
             frame.name().c_str(),
             frame.frame(),
             frame.padding(),
             frame.extension().c_str() );
 }
 
-AbstractPath::AbstractPath( const std::string& path )
-    : m_valid( false ),
-      m_name(),
-      m_extension(),
-      m_directory() {
-
-    fs::path filepath( path );
-    if ( !fs::is_directory( path ) ) {
-        m_directory = filepath.parent_path().string();
-    }
+AbstractFile::AbstractFile()
+        : m_valid( false ),
+          m_name(),
+          m_extension() {
 }
 
-std::string AbstractPath::directory() const {
-    return m_directory;
-}
-
-std::string AbstractPath::name() const {
+std::string AbstractFile::name() const {
     return m_name;
 }
 
-std::string AbstractPath::extension() const {
+std::string AbstractFile::extension() const {
     return m_extension;
 }
 
-AbstractPath::operator bool() const {
+AbstractFile::operator bool() const {
     return m_valid;
 }
 
-bool AbstractPath::operator==( const AbstractPath& rhs ) const {
+bool AbstractFile::operator==( const AbstractFile& rhs ) const {
     return m_valid &&
-            ( directory() == rhs.directory() ) &&
-            ( name() == rhs.name() ) &&
-            ( extension() == rhs.extension() );
+           ( name() == rhs.name() ) &&
+           ( extension() == rhs.extension() );
 }
 
-bool AbstractPath::operator!=( const AbstractPath& rhs ) const {
+bool AbstractFile::operator!=( const AbstractFile& rhs ) const {
     return !m_valid &&
            ( name() != rhs.name() ) &&
            ( extension() != rhs.extension() );
 }
 
-SequencePath::SequencePath( const std::string& path )
-        : AbstractPath( path ) {
+SequenceFile::SequenceFile( const std::string& path )
+        : AbstractFile() {
     m_valid = parseSequence( path, m_name, m_padding, m_extension );
 }
 
-unsigned int SequencePath::padding() const {
+SequenceFile::SequenceFile( const std::string& name,
+                            unsigned int padding,
+                            const std::string& extension )
+        : m_padding( padding ) {
+    m_name = name;
+    m_extension = extension;
+    m_valid = true;
+}
+
+unsigned int SequenceFile::padding() const {
     return m_padding;
 }
 
-bool SequencePath::operator==( const SequencePath& rhs ) const {
-    return AbstractPath::operator==( rhs ) &&
-            ( padding() == rhs.padding() );
+bool SequenceFile::operator==( const SequenceFile& rhs ) const {
+    return AbstractFile::operator==( rhs ) &&
+           ( padding() == rhs.padding() );
 }
 
-bool SequencePath::operator!=( const SequencePath& rhs ) const {
-    return AbstractPath::operator!=( rhs ) &&
-            ( padding() == rhs.padding() );
+bool SequenceFile::operator!=( const SequenceFile& rhs ) const {
+    return AbstractFile::operator!=( rhs ) &&
+           ( padding() == rhs.padding() );
 }
 
-FramePath::FramePath( const std::string& path )
-        : AbstractPath( path ) {
+
+FrameFile::FrameFile( const std::string& name,
+                      unsigned int frame,
+                      unsigned int padding,
+                      const std::string& extension )
+        : m_frame( frame ),
+          m_padding( padding ) {
+    m_name = name;
+    m_extension = extension;
+    m_valid = true;
+}
+
+FrameFile::FrameFile( const std::string& path )
+        : AbstractFile(),
+          m_frame() {
     m_valid = parseFrame( path, m_name, m_frame, m_padding, m_extension );
 }
 
-unsigned int FramePath::frame() const {
+unsigned int FrameFile::frame() const {
     return m_frame;
 }
 
-unsigned int FramePath::padding() const {
+unsigned int FrameFile::padding() const {
     return m_padding;
 }
 
-bool FramePath::match( const SequencePath& sequence ) const {
-    return padding() == sequence.padding() ||
-            isAmbiguous( frame(), sequence.padding() );
+bool FrameFile::match( const SequenceFile& sequence ) const {
+    return ( padding() == sequence.padding() ||
+             isAmbiguous( frame(), sequence.padding() ) ) &&
+           ( name() == sequence.name() ) &&
+           ( extension() == sequence.extension() );
 }
 
-bool FramePath::operator==( const FramePath& rhs ) const {
-    return AbstractPath::operator==( rhs ) &&
-            ( frame() == rhs.frame() ) &&
-            ( padding() == rhs.padding() );
+bool FrameFile::operator==( const FrameFile& rhs ) const {
+    return AbstractFile::operator==( rhs ) &&
+           ( frame() == rhs.frame() ) &&
+           ( padding() == rhs.padding() );
 }
 
-bool FramePath::operator!=( const FramePath& rhs ) const {
-    return AbstractPath::operator!=( rhs ) &&
-            ( frame() == rhs.frame() ) &&
-            ( padding() == rhs.padding() );
+bool FrameFile::operator!=( const FrameFile& rhs ) const {
+    return AbstractFile::operator!=( rhs ) &&
+           ( frame() == rhs.frame() ) &&
+           ( padding() == rhs.padding() );
 
 }

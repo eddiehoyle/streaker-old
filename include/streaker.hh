@@ -17,19 +17,10 @@
 
 typedef std::vector< boost::filesystem::path > Paths;
 
-/// TODO
-Streak findStreak( const SequencePath& path );
-Streak findStreak( const FramePath& path );
-
-/// Find streaks in a directory
-//Streaks findStreaks( const std::string& directory );
-
-/// Extract sequence id, extension from path
-bool parse( const std::string& string,
-            const std::string& pattern,
-            std::string& name,
-            std::string& padding,
-            std::string& extension );
+/// Look for all streaks in directory
+Streaks findStreaks( const std::string& directory );
+Streak findStreak( const std::string& directory, const SequenceFile& path );
+Streaks findStreaks( const std::string& directory, const SequenceFiles& paths );
 
 class Streaker {
 
@@ -43,47 +34,17 @@ class Streaker {
 public:
 
 
-//    explicit Streaker();
+    explicit Streaker( const std::string& directory );
 
 //    void setDirectory( const std::string& directory );
 
     /// Scan a directory for a named streak
-//    Streak find( const std::string& name,
-//                 unsigned int padding,
-//                 const std::string& extension );
-
-    Streak find( const SequencePath& sequence );
-
-//    // Scan a directory iterator for a streak type
-//    void run( Paths::iterator iterBegin,
-//              Paths::iterator iterLast,
-//              Streak target );
+    Streaks find();
+    Streak find( const SequenceFile& sequence );
+    Streaks find( const SequenceFiles& sequences );
 
 private:
-    boost::filesystem::path m_directory;
+    std::string m_directory;
 };
-
-//class StreakDispatcher;
-//
-//class StreakWorker {
-//
-//public:
-//    StreakWorker( StreakDispatcher& dispatcher );
-//};
-//
-//class StreakDispatcher {
-//
-//    friend class StreakWorker;
-//
-//public:
-//
-//    StreakDispatcher( const std::string& directory, const Streaks& targets );
-//
-//private:
-//    std::vector< std::thread > m_threads;
-//    Streaks m_streaks;
-//    std::mutex m_mutex;
-//};
-
 
 #endif //STREAKER_STREAKER_HH_HH

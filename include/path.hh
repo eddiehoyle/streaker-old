@@ -7,16 +7,30 @@
 
 #include <string>
 #include <parser.hh>
+#include <vector>
+#include <set>
 
-#include <boost/shared_ptr.hpp>
+//#include <memory>
 
-class SequencePath;
-class FramePath;
+class SequenceFile;
+class FrameFile;
 
-void print( const SequencePath& sequence );
-void print( const FramePath& frame );
+typedef std::vector< SequenceFile > SequenceFiles;
+typedef std::vector< FrameFile > FrameFiles;
 
-typedef boost::shared_ptr< SequencePath > SequencePathPtr;
+typedef std::set< SequenceFile > SequenceFileSet;
+typedef std::set< FrameFile > FrameFileSet;
+
+void print( const SequenceFile& sequence );
+void print( const FrameFile& frame );
+
+
+std::string format( const FrameFile& frame, const std::string& delimeter );
+std::string format( const SequenceFile& sequence,
+                    unsigned int frame,
+                    const std::string& delimeter );
+
+//typedef std::shared_ptr< SequenceFile > SequenceFilePtr;
 
 /*
  * Design notes:
@@ -25,14 +39,15 @@ typedef boost::shared_ptr< SequencePath > SequencePathPtr;
  *  public methods to retrieve this data.
  */
 
-class AbstractPath {
+class AbstractFile {
 
 public:
-    explicit AbstractPath( const std::string& path );
+    AbstractFile();
+    explicit AbstractFile( const std::string& path );
     operator bool() const;
-    bool operator==( const AbstractPath& rhs ) const;
-    bool operator!=( const AbstractPath& rhs ) const;
-    std::string directory() const;
+    bool operator==( const AbstractFile& rhs ) const;
+    bool operator!=( const AbstractFile& rhs ) const;
+//    std::string filename() const;
     std::string name() const;
     std::string extension() const;
 
@@ -40,15 +55,17 @@ protected:
     bool m_valid;
     std::string m_name;
     std::string m_extension;
-    std::string m_directory;
 };
 
-class SequencePath : public AbstractPath {
+class SequenceFile : public AbstractFile {
 
 public:
-    explicit SequencePath( const std::string& path );
-    bool operator==( const SequencePath& rhs ) const;
-    bool operator!=( const SequencePath& rhs ) const;
+    explicit SequenceFile( const std::string& name,
+                           unsigned int padding,
+                           const std::string& extension );
+    explicit SequenceFile( const std::string& path );
+    bool operator==( const SequenceFile& rhs ) const;
+    bool operator!=( const SequenceFile& rhs ) const;
     unsigned int padding() const;
 
 private:
@@ -56,15 +73,20 @@ private:
 };
 
 
-class FramePath : public AbstractPath {
+class FrameFile : public AbstractFile {
 
 public:
-    explicit FramePath( const std::string& path );
-    bool operator==( const FramePath& rhs ) const;
-    bool operator!=( const FramePath& rhs ) const;
+    explicit FrameFile( const std::string& name,
+                        unsigned int frame,
+                        unsigned int padding,
+                        const std::string& extension );
+    explicit FrameFile( const std::string& path );
+    bool operator==( const FrameFile& rhs ) const;
+    bool operator!=( const FrameFile& rhs ) const;
     unsigned int frame() const;
     unsigned int padding() const;
-    bool match( const SequencePath& sequence ) const;
+    bool match( const SequenceFile& sequence ) const;
+    SequenceFile sequence() const;
 
 private:
     unsigned int m_frame;

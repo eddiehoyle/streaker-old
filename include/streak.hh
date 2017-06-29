@@ -36,7 +36,9 @@ public:
                      const FrameRange& range,
                      unsigned int padding,
                      const std::string& extension );
-    explicit Streak( const SequencePath& sequence, const FrameRange& range );
+    explicit Streak( const std::string& directory,
+                     const SequenceFile& sequence,
+                     const FrameRange& range );
 
     Streak( const Streak& streak );
 
