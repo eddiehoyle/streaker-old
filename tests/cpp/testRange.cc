@@ -8,7 +8,7 @@ TEST( TestRange, constructor ) {
 
     FrameRange range;
 
-    EXPECT_EQ( range.getFrames(), FrameSet() ) << "Wrong frames";
+    EXPECT_EQ( range.frames(), FrameSet() ) << "Wrong frames";
     EXPECT_EQ( range.getCount(), 0 ) << "Wrong frame count";
     EXPECT_EQ( range.getFirst(), 0 ) << "Wrong first";
     EXPECT_EQ( range.getLast(), 0 ) << "Wrong last";
@@ -27,7 +27,7 @@ TEST( TestRange, explict_constructor ) {
         expectedFrames.insert( expectedFrames.end(), frame );
     }
 
-    EXPECT_EQ( range.getFrames(), expectedFrames ) << "Wrong frames";
+    EXPECT_EQ( range.frames(), expectedFrames ) << "Wrong frames";
     EXPECT_EQ( range.getCount(), expectedCount ) << "Wrong frame count";
     EXPECT_EQ( range.getFirst(), expectedFirst ) << "Wrong first";
     EXPECT_EQ( range.getLast(), expectedLast ) << "Wrong last";

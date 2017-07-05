@@ -15,7 +15,7 @@ void print( const Streak& streak ) {
             streak.getName().c_str(),
             streak.getRange().getFirst(),
             streak.getRange().getLast(),
-            streak.getRange().getFrames().size(),
+            streak.getRange().frames().size(),
             streak.getPadding(),
             streak.getExtension().c_str() );
 }
@@ -32,7 +32,9 @@ Streak::Streak( const std::string& directory,
           m_extension( extension ) {
 }
 
-Streak::Streak( const std::string& directory, const SequenceFile& sequence, const FrameRange& range )
+Streak::Streak( const std::string& directory,
+                const SequenceFile& sequence,
+                const FrameRange& range )
         : m_directory( directory ),
           m_name( sequence.name() ),
           m_padding( sequence.padding() ),

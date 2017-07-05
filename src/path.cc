@@ -135,6 +135,13 @@ unsigned int SequenceFile::padding() const {
     return m_padding;
 }
 
+bool SequenceFile::operator<( const SequenceFile& rhs ) const {
+    return padding() < rhs.padding();
+}
+bool SequenceFile::operator>( const SequenceFile& rhs ) const {
+    return padding() < rhs.padding();
+}
+
 bool SequenceFile::operator==( const SequenceFile& rhs ) const {
     return AbstractFile::operator==( rhs ) &&
            ( padding() == rhs.padding() );

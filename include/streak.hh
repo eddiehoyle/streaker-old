@@ -55,7 +55,7 @@ public:
     void setExtension( const std::string& extension );
 
     operator bool() const {
-        return !( m_name.empty() || m_extension.empty() );
+        return m_range.getCount() != 0;
     }
 
     bool operator==( const Streak& rhs ) {

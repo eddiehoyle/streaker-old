@@ -14,11 +14,18 @@
 
 typedef std::set< unsigned int > FrameSet;
 
+class FrameRange;
+
+void print( const FrameRange& range );
+
 class FrameRange {
 
     /// Represents a range of numbers that share a padding fill value
     /// 1, 2, 3 ... 1001, 1002
     /// 001, 002, 003 ... 1001, 1002
+
+    /// Ranges will need to support skipping
+    /// "1-3,5-11x2,14,1001"
 
 public:
 
@@ -30,7 +37,10 @@ public:
     void addFrame( unsigned int frame );
     void addFrames( const FrameSet& frames );
     void setFrames( const FrameSet& frames );
-    FrameSet getFrames() const;
+
+    /// TODO:
+    /// Make this a const ref?
+    FrameSet frames() const;
 
     std::size_t getCount() const;
 

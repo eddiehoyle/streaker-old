@@ -4,6 +4,38 @@
 
 #include <range.hh>
 #include <numeric>
+#include <sstream>
+
+void print( const FrameRange& range ) {
+
+    // Example:
+    // 1, 2, 3, 5
+    // 1-3, 5
+
+    std::ostringstream stream;
+
+//    const FrameSet frames = range.frames();
+//    for ( FrameSet::const_iterator iter = frames.begin();
+//          iter != frames.end();
+//          ++iter ) {
+//
+//        unsigned int frame = *iter;
+//        stream << frame;
+//
+//        ++iter;
+
+//        if ( iter != frames.end() ) {
+//
+//            unsigned int next = *iter;
+//            if ( ( next - frame ) == 1 ) {
+//                continue;
+//            }
+//        }
+//    }
+
+    printf( "%s\n", stream.str().c_str() );
+
+}
 
 FrameRange::FrameRange()
         : m_frames() {}
@@ -33,7 +65,7 @@ void FrameRange::setFrames( const FrameSet& frames ) {
     m_frames = frames;
 }
 
-FrameSet FrameRange::getFrames() const {
+FrameSet FrameRange::frames() const {
     return m_frames;
 }
 
@@ -50,5 +82,5 @@ unsigned int FrameRange::getLast() const {
 }
 
 bool FrameRange::operator==( const FrameRange& rhs ) const {
-    return getFrames() == rhs.getFrames();
+    return frames() == rhs.frames();
 }

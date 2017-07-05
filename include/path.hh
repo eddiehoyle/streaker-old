@@ -64,6 +64,8 @@ public:
                            unsigned int padding,
                            const std::string& extension );
     explicit SequenceFile( const std::string& path );
+    bool operator<( const SequenceFile& rhs ) const;
+    bool operator>( const SequenceFile& rhs ) const;
     bool operator==( const SequenceFile& rhs ) const;
     bool operator!=( const SequenceFile& rhs ) const;
     unsigned int padding() const;

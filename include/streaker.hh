@@ -18,9 +18,7 @@
 typedef std::vector< boost::filesystem::path > Paths;
 
 /// Look for all streaks in directory
-Streaks findStreaks( const std::string& directory );
 Streak findStreak( const std::string& directory, const SequenceFile& path );
-Streaks findStreaks( const std::string& directory, const SequenceFiles& paths );
 
 class Streaker {
 
@@ -39,9 +37,17 @@ public:
 //    void setDirectory( const std::string& directory );
 
     /// Scan a directory for a named streak
-    Streaks find();
     Streak find( const SequenceFile& sequence );
-    Streaks find( const SequenceFiles& sequences );
+
+private:
+
+    /// Match
+    Streaks match( Paths::iterator begin, Paths::iterator end, SequenceFileSet sequences );
+    Streaks match( Paths::iterator begin, Paths::iterator end );
+
+    /// Find frames from files
+    FrameRange match( Paths::iterator begin, Paths::iterator end, SequenceFile sequence );
+
 
 private:
     std::string m_directory;

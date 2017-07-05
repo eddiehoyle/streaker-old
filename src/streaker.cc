@@ -38,14 +38,6 @@ Paths listDirectory( const fs::path directory ) {
     return paths;
 }
 
-/// TODO
-Streaks findStreaks( const std::string& directory ) {
-
-    Streaker streaker( directory );
-    Streaks streaks = streaker.find();
-    return streaks;
-}
-
 Streak findStreak( const std::string& directory, const SequenceFile& sequence ) {
 
     if ( !sequence ) {
@@ -56,83 +48,10 @@ Streak findStreak( const std::string& directory, const SequenceFile& sequence ) 
     return streaker.find( sequence );
 }
 
-Streaks findStreaks( const std::string& directory, const SequenceFiles& sequences ) {
-
-    if ( sequences.empty() ) {
-        return Streaks();
-    }
-
-    Streaks streaks;
-    for ( const SequenceFile& sequence : sequences ) {
-
-        Streaker streaker( directory );
-        Streak streak = streaker.find( sequence );
-        streaks.push_back( streak );
-    }
-    return streaks;
-}
-
 Streaker::Streaker( const std::string& directory )
-    : m_directory( directory ) {
+        : m_directory( directory ) {
 }
 
-Streaks Streaker::find() {
-
-    // Does the directory exist?
-    if ( !fs::exists( m_directory ) ) {
-        std::cerr << "Directory does not exist: " << m_directory << std::endl;
-        return Streaks();
-    }
-
-    // List all paths in directory
-    Paths paths = listDirectory( m_directory );
-
-    SequenceFileSet sequences;
-    for ( const fs::path& path : paths ) {
-        if ( FrameFile frame = FrameFile( path.filename().string() ) ) {
-            print( frame );
-            SequenceFile sequence( frame.name(),
-                                   frame.padding(),
-                                   frame.extension() );
-            sequences.insert( sequence );
-        }
-    }
-
-    printf( "Found sequences: %lu\n", sequences.size() );
-
-    Streaks streaks;
-    for ( const SequenceFile& sequence : sequences ) {
-
-        if ( !sequence ) {
-            continue;
-        }
-
-        // Data set
-        FrameSet frames;
-
-        // Loop through paths, extract frames
-        for ( const fs::path& path: paths ) {
-
-            FrameFile frame( path.string() );
-            if ( !frame ) {
-                continue;
-            }
-
-            if ( frame.match( sequence ) ) {
-                frames.insert( frame.frame() );
-            }
-        }
-
-        // Collect frames
-        FrameRange range;
-        range.setFrames( frames );
-        Streak streak( m_directory, sequence, range );
-
-        // Cache
-        streaks.push_back( streak );
-    }
-    return streaks;
-}
 Streak Streaker::find( const SequenceFile& sequence ) {
 
     if ( !sequence ) {
@@ -148,74 +67,39 @@ Streak Streaker::find( const SequenceFile& sequence ) {
     // List all paths in directory
     Paths paths = listDirectory( m_directory );
 
+    // Collect frames
+    FrameRange range = match( paths.begin(), paths.end(), sequence );
+
+    Streak streak( m_directory, sequence, range );
+    return streak;
+}
+
+FrameRange Streaker::match( Paths::iterator begin,
+                            Paths::iterator end,
+                            SequenceFile sequence ) {
+
+    print( sequence );
+
+    if ( std::distance( begin, end ) <= 0 ) {
+        return FrameRange();
+    }
+
     // Data set
     FrameSet frames;
 
-    // Loop through paths, extract frames
-    for ( const fs::path& path: paths ) {
-
-        FrameFile frame( path.string() );
-        if ( !frame ) {
-            continue;
+    // Loop
+    while ( begin != end ) {
+        if ( FrameFile frame = FrameFile( begin->filename().string() ) ) {
+            if ( frame.match( sequence ) ) {
+                frames.insert( frame.frame() );
+            }
         }
-
-        if ( frame.match( sequence ) ) {
-            frames.insert( frame.frame() );
-        }
+        ++begin;
     }
 
     // Collect frames
     FrameRange range;
     range.setFrames( frames );
 
-    Streak streak( m_directory, sequence, range );
-    return streak;
+    return range;
 }
-
-
-Streaks Streaker::find( const SequenceFiles& sequences ) {
-
-    // Does the directory exist?
-    if ( !fs::exists( m_directory ) ) {
-        std::cerr << "Directory does not exist: " << m_directory << std::endl;
-        return Streaks();
-    }
-
-    // List all paths in directory
-    Paths paths = listDirectory( m_directory );
-
-    Streaks streaks;
-    for ( const SequenceFile& sequence : sequences ) {
-
-        if ( !sequence ) {
-            continue;
-        }
-
-        // Data set
-        FrameSet frames;
-
-        // Loop through paths, extract frames
-        for ( const fs::path& path: paths ) {
-
-            FrameFile frame( path.string() );
-            if ( !frame ) {
-                continue;
-            }
-
-            if ( frame.match( sequence ) ) {
-                frames.insert( frame.frame() );
-            }
-        }
-
-        // Collect frames
-        FrameRange range;
-        range.setFrames( frames );
-        Streak streak( m_directory, sequence, range );
-
-        // Cache
-        streaks.push_back( streak );
-    }
-    return streaks;
-}
-
-
