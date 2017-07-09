@@ -2,22 +2,20 @@
 // Created by Eddie Hoyle on 7/05/17.
 //
 
-#include <defs.hh>
-#include <streak.hh>
+#include <streaker/Streak.hh>
+#include <streaker/file/SequenceFile.hh>
+#include <streaker/file/FrameFile.hh>
 
 #include <boost/xpressive/xpressive.hpp>
-#include <boost/filesystem.hpp>
 
 namespace xp = boost::xpressive;
 
-void print( const Streak& streak ) {
-    printf( "Streak(name='%s', range=(%d, %d), frames=%lu, padding=%d, extension='%s')\n",
-            streak.getName().c_str(),
-            streak.getRange().getFirst(),
-            streak.getRange().getLast(),
-            streak.getRange().frames().size(),
-            streak.getPadding(),
-            streak.getExtension().c_str() );
+Streak::Streak()
+        : m_directory(),
+          m_name(),
+          m_padding(),
+          m_range(),
+          m_extension() {
 }
 
 Streak::Streak( const std::string& directory,
@@ -43,30 +41,44 @@ Streak::Streak( const std::string& directory,
 }
 
 Streak::Streak( const Streak& streak )
-        : m_directory( streak.getDirectory() ),
-          m_name( streak.getName() ),
-          m_padding( streak.getPadding() ),
-          m_range( streak.getRange() ),
-          m_extension( streak.getExtension() ) {
+        : m_directory( streak.directory() ),
+          m_name( streak.name() ),
+          m_padding( streak.padding() ),
+          m_range( streak.range() ),
+          m_extension( streak.extension() ) {
 }
 
-std::string Streak::getDirectory() const {
+Streak::operator bool() const {
+    return !m_range.frames().empty();
+}
+
+bool Streak::operator==( const Streak& rhs ) {
+    return ( this->extension() == rhs.extension() ) &&
+           ( this->range() == rhs.range() ) &&
+           ( this->name() == rhs.name() );
+}
+
+bool Streak::operator!=( const Streak& rhs ) {
+    return !( *this == rhs );
+}
+
+std::string Streak::directory() const {
     return m_directory;
 }
 
-std::string Streak::getName() const {
+std::string Streak::name() const {
     return m_name;
 }
 
-unsigned int Streak::getPadding() const {
+unsigned int Streak::padding() const {
     return m_padding;
 }
 
-FrameRange Streak::getRange() const {
+FrameRange Streak::range() const {
     return m_range;
 }
 
-std::string Streak::getExtension() const {
+std::string Streak::extension() const {
     return m_extension;
 }
 

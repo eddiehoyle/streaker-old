@@ -5,10 +5,8 @@
 #ifndef STREAKER_PARSER_HH
 #define STREAKER_PARSER_HH
 
-#include <iostream>
+#include <string>
 #include <algorithm>
-
-#include <ctype.h>
 
 /// Parse a frame number filename, eg: "test.1001.exr"
 bool parseFrame( const std::string& filename,
@@ -23,7 +21,6 @@ bool parseSequence( const std::string& filename,
                     unsigned int& padding,
                     std::string& extension );
 
-
 inline bool isNumber( const std::string& pattern ) {
     return std::all_of( pattern.begin(),
                         pattern.end(),
@@ -33,13 +30,13 @@ inline bool isNumber( const std::string& pattern ) {
 inline bool isHash( const std::string& pattern ) {
     return std::all_of( pattern.begin(),
                         pattern.end(),
-                        []( char c ){ return c == '#'; } );
+                        []( char c ) { return c == '#'; } );
 }
 
 inline bool isAt( const std::string& pattern ) {
     return std::all_of( pattern.begin(),
                         pattern.end(),
-                        []( char c ){ return c == '@'; } );
+                        []( char c ) { return c == '@'; } );
 }
 
 #endif //STREAKER_PARSER_HH

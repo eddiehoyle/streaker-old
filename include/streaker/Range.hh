@@ -10,7 +10,7 @@
 #include <set>
 #include <map>
 
-#include <padding.hh>
+#include <streaker/Padding.hh>
 
 typedef std::set< unsigned int > FrameSet;
 

@@ -2,7 +2,7 @@
 // Created by Eddie Hoyle on 18/06/17.
 //
 #include <gtest/gtest.h>
-#include <padding.hh>
+#include <streaker/Padding.hh>
 
 TEST( TestPadding, countDigits ) {
 

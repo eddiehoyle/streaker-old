@@ -2,12 +2,21 @@
 // Created by Eddie Hoyle on 21/06/17.
 //
 
-#include <defs.hh>
-#include <parser.hh>
-#include <padding.hh>
+#include <streaker/Parser.hh>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/xpressive/xpressive.hpp>
+
+
+/// # or @ sequence
+/// TODO:
+/// Write a smarter capture pattern to extract delimeters
+static const char* SEQUENCE = "(?P<name>\\w+)[\\.|_](?P<padding>[@|#]+)[\\.](?P<extension>\\w+)$";
+
+/// Numbered frame
+/// TODO:
+/// Write a smarter capture pattern to extract delimeters
+static const char* FRAME = "(?P<name>\\w+)[\\.|_](?P<frame>[0-9]+)[\\.](?P<extension>\\w+)$";
 
 namespace xp = boost::xpressive;
 

@@ -2,7 +2,7 @@
 // Created by Eddie Hoyle on 15/06/17.
 //
 #include <gtest/gtest.h>
-#include <range.hh>
+#include <streaker/Range.hh>
 
 TEST( TestRange, constructor ) {
 

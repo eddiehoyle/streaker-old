@@ -3,7 +3,7 @@
 //
 
 #include <gtest/gtest.h>
-#include <parser.hh>
+#include <streaker/Parser.hh>
 
 TEST( TestParser, parseFrame ) {
 
@@ -63,8 +63,8 @@ TEST( TestParser, parseFrame ) {
                                extensionD );
     EXPECT_FALSE( resultD ) << "Filename returned true when parsed: " << filenameD;
 
-    // Directory as path
-    const std::string filenameE = "/path/to/frame";
+    // Directory as file
+    const std::string filenameE = "/file/to/frame";
     std::string nameE, extensionE;
     unsigned int frameE, paddingE;
     bool resultE = parseFrame( filenameE,
