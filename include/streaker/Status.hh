@@ -2,9 +2,10 @@
 // Created by Eddie Hoyle on 21/05/17.
 //
 
-#ifndef STREAKER_STATUS_HH_HH
-#define STREAKER_STATUS_HH_HH
+#ifndef STREAKER_STATUS_HH
+#define STREAKER_STATUS_HH
 
+namespace streaker {
 
 enum StatusCode {
     kFailure,
@@ -14,16 +15,13 @@ enum StatusCode {
 class Status {
 
 public:
-    explicit Status( StatusCode status )
-        : m_code( status ) {}
-
-    bool operator==( const Status& rhs ) {
-        return m_code == rhs.m_code;
-    }
-
+    explicit Status( StatusCode status );
+    bool operator==( const Status& rhs );
 private:
     StatusCode m_code;
 
 };
 
-#endif //STREAKER_STATUS_HH_HH
+} // namespace streaker
+
+#endif // STREAKER_STATUS_HH

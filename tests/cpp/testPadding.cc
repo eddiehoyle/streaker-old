@@ -1,8 +1,9 @@
-//
-// Created by Eddie Hoyle on 18/06/17.
-//
 #include <gtest/gtest.h>
+
 #include <streaker/Padding.hh>
+
+using namespace streaker;
+
 
 TEST( TestPadding, countDigits ) {
 

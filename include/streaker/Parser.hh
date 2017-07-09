@@ -1,12 +1,10 @@
-//
-// Created by Eddie Hoyle on 21/06/17.
-//
-
 #ifndef STREAKER_PARSER_HH
 #define STREAKER_PARSER_HH
 
 #include <string>
 #include <algorithm>
+
+namespace streaker {
 
 /// Parse a frame number filename, eg: "test.1001.exr"
 bool parseFrame( const std::string& filename,
@@ -39,4 +37,6 @@ inline bool isAt( const std::string& pattern ) {
                         []( char c ) { return c == '@'; } );
 }
 
-#endif //STREAKER_PARSER_HH
+} // namespace streaker;
+
+#endif // STREAKER_PARSER_HH

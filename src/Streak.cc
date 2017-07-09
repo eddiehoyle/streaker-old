@@ -10,6 +10,8 @@
 
 namespace xp = boost::xpressive;
 
+namespace streaker {
+
 Streak::Streak()
         : m_directory(),
           m_name(),
@@ -101,3 +103,5 @@ void Streak::setRange( const FrameRange& range ) {
 void Streak::setExtension( const std::string& extension ) {
     m_extension = extension;
 }
+
+} // namespace streaker

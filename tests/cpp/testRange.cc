@@ -1,8 +1,7 @@
-//
-// Created by Eddie Hoyle on 15/06/17.
-//
 #include <gtest/gtest.h>
 #include <streaker/Range.hh>
+
+using namespace streaker;
 
 TEST( TestRange, constructor ) {
 

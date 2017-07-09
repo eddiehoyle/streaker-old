@@ -7,6 +7,8 @@
 #include <streaker/Padding.hh>
 #include <streaker/Parser.hh>
 
+namespace streaker {
+
 FrameFile::FrameFile( const std::string& name,
                       unsigned int frame,
                       unsigned int padding,
@@ -50,3 +52,5 @@ bool FrameFile::operator!=( const FrameFile& rhs ) const {
            ( frame() == rhs.frame() ) &&
            ( padding() == rhs.padding() );
 }
+
+} // namespace streaker

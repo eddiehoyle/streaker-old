@@ -1,9 +1,8 @@
-//
-// Created by Eddie Hoyle on 23/06/17.
-//
-
 #include <gtest/gtest.h>
+
 #include <streaker/Parser.hh>
+
+using namespace streaker;
 
 TEST( TestParser, parseFrame ) {
 

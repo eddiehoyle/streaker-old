@@ -1,13 +1,11 @@
-//
-// Created by Eddie Hoyle on 8/07/17.
-//
-
 #ifndef STREAKER_FRAMEFILE_HH
 #define STREAKER_FRAMEFILE_HH
 
 #include "AbstractFile.hh"
 
 #include <vector>
+
+namespace streaker {
 
 class FrameFile;
 class SequenceFile;
@@ -36,4 +34,6 @@ private:
     unsigned int m_padding;
 };
 
-#endif //STREAKER_FRAMEFILE_HH
+} // namespace streaker
+
+#endif // STREAKER_FRAMEFILE_HH

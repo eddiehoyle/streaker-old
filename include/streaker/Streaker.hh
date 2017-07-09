@@ -1,12 +1,11 @@
-//
-// Created by Eddie Hoyle on 7/05/17.
-//
+#ifndef STREAKER_STREAKER_HH
+#define STREAKER_STREAKER_HH
 
-#ifndef STREAKER_STREAKER_HH_HH
-#define STREAKER_STREAKER_HH_HH
-
-//#include <streaker/file/SequenceFile.hh>
 #include <streaker/Streak.hh>
+
+#include <string>
+
+namespace streaker {
 
 class SquenceFile;
 
@@ -21,4 +20,6 @@ private:
     std::string m_directory;
 };
 
-#endif //STREAKER_STREAKER_HH_HH
+} // namespace streaker
+
+#endif // STREAKER_STREAKER_HH

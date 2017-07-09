@@ -6,6 +6,8 @@
 #include <streaker/file/SequenceFile.hh>
 #include <streaker/file/FrameFile.hh>
 
+namespace streaker {
+
 AbstractFile::AbstractFile()
         : m_valid( false ),
           m_name(),
@@ -35,3 +37,5 @@ bool AbstractFile::operator!=( const AbstractFile& rhs ) const {
            ( name() != rhs.name() ) &&
            ( extension() != rhs.extension() );
 }
+
+} // namespace streaker

@@ -7,16 +7,17 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/xpressive/xpressive.hpp>
 
+namespace streaker {
 
 /// # or @ sequence
 /// TODO:
 /// Write a smarter capture pattern to extract delimeters
-static const char* SEQUENCE = "(?P<name>\\w+)[\\.|_](?P<padding>[@|#]+)[\\.](?P<extension>\\w+)$";
+static const char *SEQUENCE = "(?P<name>\\w+)[\\.|_](?P<padding>[@|#]+)[\\.](?P<extension>\\w+)$";
 
 /// Numbered frame
 /// TODO:
 /// Write a smarter capture pattern to extract delimeters
-static const char* FRAME = "(?P<name>\\w+)[\\.|_](?P<frame>[0-9]+)[\\.](?P<extension>\\w+)$";
+static const char *FRAME = "(?P<name>\\w+)[\\.|_](?P<frame>[0-9]+)[\\.](?P<extension>\\w+)$";
 
 namespace xp = boost::xpressive;
 
@@ -78,3 +79,5 @@ bool parseSequence( const std::string& filename,
     }
     return result;
 }
+
+} // namespace streaker

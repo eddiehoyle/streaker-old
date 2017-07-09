@@ -1,11 +1,9 @@
-//
-// Created by Eddie Hoyle on 8/05/17.
-//
-
 #ifndef STREAKER_PADDING_HH
 #define STREAKER_PADDING_HH
 
 #include <string>
+
+namespace streaker {
 
 inline unsigned int countDigits( unsigned int frame ) {
     unsigned int length = 1;
@@ -19,4 +17,6 @@ inline bool isAmbiguous( unsigned int frame, unsigned int padding ) {
     return countDigits( frame ) >= padding;
 }
 
-#endif //STREAKER_PADDING_HH
+} // namespace streaker;
+
+#endif // STREAKER_PADDING_HH

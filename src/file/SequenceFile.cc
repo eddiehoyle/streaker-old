@@ -6,6 +6,8 @@
 
 #include <streaker/Parser.hh>
 
+namespace streaker {
+
 SequenceFile::SequenceFile( const std::string& path )
         : AbstractFile() {
     m_valid = parseSequence( path, m_name, m_padding, m_extension );
@@ -27,6 +29,7 @@ unsigned int SequenceFile::padding() const {
 bool SequenceFile::operator<( const SequenceFile& rhs ) const {
     return padding() < rhs.padding();
 }
+
 bool SequenceFile::operator>( const SequenceFile& rhs ) const {
     return padding() < rhs.padding();
 }
@@ -39,4 +42,6 @@ bool SequenceFile::operator==( const SequenceFile& rhs ) const {
 bool SequenceFile::operator!=( const SequenceFile& rhs ) const {
     return AbstractFile::operator!=( rhs ) &&
            ( padding() == rhs.padding() );
+}
+
 }

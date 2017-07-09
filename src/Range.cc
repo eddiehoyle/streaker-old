@@ -6,6 +6,8 @@
 #include <numeric>
 #include <sstream>
 
+namespace streaker {
+
 FrameRange::FrameRange()
         : m_frames() {}
 
@@ -54,3 +56,5 @@ bool FrameRange::operator==( const FrameRange& rhs ) const {
     return ( getCount() == rhs.getCount() ) &&
            ( frames() == rhs.frames() );
 }
+
+} // namespace streaker

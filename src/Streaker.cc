@@ -1,16 +1,18 @@
 
-#include "streaker/Streaker.hh"
+#include <streaker/Streaker.hh>
 #include <streaker/Range.hh>
+#include <streaker/Format.hh>
 
 #include <streaker/file/SequenceFile.hh>
 #include <streaker/file/FrameFile.hh>
-#include <streaker/Format.hh>
 
 #include <iostream>
 
 #include <boost/filesystem.hpp>
 
 namespace fs = boost::filesystem;
+
+namespace streaker {
 
 typedef std::vector< fs::path > Paths;
 
@@ -91,3 +93,4 @@ Streak Streaker::find( const SequenceFile& sequence ) {
     return streak;
 }
 
+} // namespace streaker;

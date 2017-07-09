@@ -1,11 +1,9 @@
-//
-// Created by Eddie Hoyle on 8/07/17.
-//
-
 #ifndef STREAKER_ABSTRACTFILE_HH
 #define STREAKER_ABSTRACTFILE_HH
 
 #include <string>
+
+namespace streaker {
 
 class AbstractFile {
 
@@ -24,4 +22,6 @@ protected:
     std::string m_extension;
 };
 
-#endif //STREAKER_ABSTRACTFILE_HH
+} // namespace streaker
+
+#endif // STREAKER_ABSTRACTFILE_HH

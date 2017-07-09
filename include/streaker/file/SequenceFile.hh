@@ -1,13 +1,11 @@
-//
-// Created by Eddie Hoyle on 8/07/17.
-//
-
 #ifndef STREAKER_SEQUENCEFILE_HH
 #define STREAKER_SEQUENCEFILE_HH
 
 #include "AbstractFile.hh"
 
 #include <vector>
+
+namespace streaker {
 
 class SequenceFile;
 
@@ -30,4 +28,6 @@ private:
     unsigned int m_padding;
 };
 
-#endif //STREAKER_SEQUENCEFILE_HHw
+} // namespace streaker
+
+#endif // STREAKER_SEQUENCEFILE_HHw

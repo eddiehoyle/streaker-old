@@ -1,7 +1,3 @@
-//
-// Created by Eddie Hoyle on 7/05/17.
-//
-
 #ifndef STREAKER_STREAK_HH
 #define STREAKER_STREAK_HH
 
@@ -10,7 +6,10 @@
 #include <vector>
 #include <string>
 
+namespace streaker {
+
 class Streak;
+
 class SequenceFile;
 
 typedef std::vector< Streak > Streaks;
@@ -40,7 +39,6 @@ public:
     void setPadding( unsigned int padding );
     void setRange( const FrameRange& range );
     void setExtension( const std::string& extension );
-
     operator bool() const;
     bool operator==( const Streak& rhs );
     bool operator!=( const Streak& rhs );
@@ -56,4 +54,6 @@ private:
     std::string m_extension;
 };
 
-#endif //STREAKER_STREAK_HH
+} // namespace streaker
+
+#endif // STREAKER_STREAK_HH

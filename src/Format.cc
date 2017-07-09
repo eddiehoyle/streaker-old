@@ -13,6 +13,8 @@
 
 namespace fs = boost::filesystem;
 
+namespace streaker {
+
 std::string format( const FrameFile& frame, const std::string& delimeter ) {
 
     std::ostringstream stream;
@@ -93,3 +95,5 @@ void print( const Streak& streak ) {
             streak.padding(),
             streak.extension().c_str() );
 }
+
+} // namespace streaker
